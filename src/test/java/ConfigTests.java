@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ConfigTest {
+public class ConfigTests {
 
     @Test
     public void testDefaultSave(@TempDir Path tempDir) throws IOException {
