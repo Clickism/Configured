@@ -1,9 +1,10 @@
 plugins {
     id("java")
+    id("maven-publish")
 }
 
 group = "me.clickism"
-version = "1.0-SNAPSHOT"
+version = property("library_version").toString()
 
 repositories {
     mavenCentral()
@@ -27,4 +28,33 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.register<Jar>("sourcesJar") {
+    from(sourceSets.main.get().allSource)
+    archiveClassifier.set("sources")
+}
+
+tasks.register<Jar>("javadocJar") {
+    from(tasks.javadoc)
+    archiveClassifier.set("javadoc")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+        }
+    }
+    repositories {
+        maven {
+            name = "mavenLocal"
+        }
+    }
+}
+
+tasks.named("publish") {
+    dependsOn(tasks["sourcesJar"], tasks["javadocJar"])
 }
