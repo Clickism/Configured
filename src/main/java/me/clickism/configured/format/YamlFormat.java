@@ -24,6 +24,9 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
 
+/**
+ * YAML format for configuration files.
+ */
 public class YamlFormat extends ConfigFormat {
 
     private static final List<@NotNull CommentLine> LINE_BREAK_COMMENT = List.of(
@@ -34,6 +37,9 @@ public class YamlFormat extends ConfigFormat {
     private final DumpSettings dumpSettings;
     private final BaseRepresenter representer;
 
+    /**
+     * Creates a new YamlFormat instance.
+     */
     public YamlFormat() {
         this.load = new Load(LoadSettings.builder().build());
         this.dumpSettings = DumpSettings.builder()

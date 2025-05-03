@@ -2,28 +2,62 @@ package me.clickism.configured;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Represents a config option.
+ * <p>
+ * Overrides the {@link #hashCode()} method to return the hash code of the key.
+ *
+ * @param <T> the type of the config option
+ */
 public abstract class ConfigOption<T> {
     private final String key;
     private final T defaultValue;
     private @Nullable String description;
 
+    /**
+     * Creates a new config option.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     */
     protected ConfigOption(String key, T defaultValue) {
         this.key = key;
         this.defaultValue = defaultValue;
     }
 
+    /**
+     * Gets the key of the config option.
+     *
+     * @return the key of the config option
+     */
     public String key() {
         return key;
     }
 
+    /**
+     * Gets the default value of the config option.
+     *
+     * @return the default value of the config option
+     */
     public T defaultValue() {
         return defaultValue;
     }
 
+    /**
+     * Gets the description of the config option.
+     *
+     * @return the description of the config option, or null if not set
+     */
     public @Nullable String description() {
         return description;
     }
 
+    /**
+     * Sets the description of the config option.
+     *
+     * @param description the description of the config option
+     * @return this config option
+     */
     public ConfigOption<T> description(String description) {
         this.description = description;
         return this;
@@ -34,6 +68,14 @@ public abstract class ConfigOption<T> {
         return key.hashCode();
     }
 
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @param <T>          the type of the config option
+     * @return the new config option
+     */
     public static <T> ConfigOption<T> of(String key, T defaultValue) {
         return new ConfigOption<>(key, defaultValue) {};
     }
