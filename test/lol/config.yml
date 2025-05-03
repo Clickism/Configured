@@ -1,7 +1,0 @@
-# Enable or disable claiming villagers.
-# Default: true
-enable_claims: true
-
-# Whitelist of mobs that can be claimed.
-# Default: []
-whitelisted_mobs: []
