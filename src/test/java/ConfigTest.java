@@ -29,6 +29,22 @@ public class ConfigTest {
     }
 
     @Test
+    public void testSave(@TempDir Path tempDir) throws IOException {
+        File file = tempDir.resolve("config.yml").toFile();
+        Config config = Config.ofYaml(file);
+        ConfigOption<Boolean> enabled = config.register(ConfigOption.of("enabled", true));
+        ConfigOption<List<String>> list = config.register(ConfigOption.of("list", List.of("a", "b", "c")));
+        config.set(enabled, false);
+        config.set(list, List.of("x", "y", "z"));
+        config.save();
+
+        List<String> lines = Files.readAllLines(file.toPath());
+        assertEquals("enabled: false", lines.get(0));
+        assertEquals("", lines.get(1));
+        assertEquals("list: [x, y, z]", lines.get(2));
+    }
+
+    @Test
     public void testLoad(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
         Files.write(file.toPath(), List.of(
