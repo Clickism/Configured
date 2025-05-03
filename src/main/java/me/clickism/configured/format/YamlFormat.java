@@ -55,7 +55,7 @@ public class YamlFormat extends ConfigFormat {
     }
 
     @Override
-    public void write(File file, Map<ConfigOption<?>, Object> data) throws IOException {
+    public void write(File file, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             StreamDataWriter streamDataWriter = new YamlOutputStreamWriter(outputStream, StandardCharsets.UTF_8) {
                 @Override
@@ -71,9 +71,9 @@ public class YamlFormat extends ConfigFormat {
         }
     }
 
-    private MappingNode toMappingNode(Map<ConfigOption<?>, Object> data) {
+    private MappingNode toMappingNode(List<Map.Entry<ConfigOption<?>, Object>> data) {
         List<NodeTuple> nodes = new ArrayList<>(data.size());
-        Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.entrySet().iterator();
+        Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.iterator();
         while (iterator.hasNext()) {
             Map.Entry<ConfigOption<?>, Object> entry = iterator.next();
             ConfigOption<?> option = entry.getKey();

@@ -5,10 +5,7 @@ import me.clickism.configured.format.YamlFormat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 public class Config {
@@ -63,10 +60,10 @@ public class Config {
 
     public void save() {
         // Save all options, even if they are not set
-        Map<ConfigOption<?>, Object> dataToSave = new HashMap<>();
+        List<Map.Entry<ConfigOption<?>, Object>> dataToSave = new ArrayList<>(options.size());
         for (ConfigOption<?> option : options) {
             Object value = data.getOrDefault(option.key(), option.defaultValue());
-            dataToSave.put(option, value);
+            dataToSave.add(Map.entry(option, value));
         }
         // Save the data to the file
         try {
