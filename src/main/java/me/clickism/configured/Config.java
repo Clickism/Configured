@@ -2,6 +2,7 @@ package me.clickism.configured;
 
 import me.clickism.configured.format.ConfigFormat;
 import me.clickism.configured.format.YamlFormat;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +18,9 @@ public class Config {
 
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
     private Map<String, Object> data = new HashMap<>();
+
+    private @Nullable String header;
+    private @Nullable String footer;
 
     /**
      * Creates a new Config instance.
@@ -116,10 +120,19 @@ public class Config {
                 Configured.LOGGER.info("Config file '" + file.getPath() + "' doesn't exist, creating it");
                 file.createNewFile();
             }
-            format.write(file, dataToSave);
+            format.write(this, dataToSave);
         } catch (IOException e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to save config file: " + file.getAbsolutePath(), e);
         }
+    }
+
+    /**
+     * Gets the file associated with this config.
+     *
+     * @return the file associated with this config
+     */
+    public File file() {
+        return file;
     }
 
     /**
@@ -152,6 +165,46 @@ public class Config {
      */
     public Config writeComments(boolean writeComments) {
         format.writeComments(writeComments);
+        return this;
+    }
+
+    /**
+     * Gets the header of the config file.
+     *
+     * @return the header of the config file
+     */
+    public @Nullable String header() {
+        return header;
+    }
+
+    /**
+     * Sets the header of the config file.
+     *
+     * @param header the header to set
+     * @return this Config instance
+     */
+    public Config header(String header) {
+        this.header = header.trim();
+        return this;
+    }
+
+    /**
+     * Gets the footer of the config file.
+     *
+     * @return the footer of the config file
+     */
+    public @Nullable String footer() {
+        return footer;
+    }
+
+    /**
+     * Sets the footer of the config file.
+     *
+     * @param footer the footer to set
+     * @return this Config instance
+     */
+    public Config footer(String footer) {
+        this.footer = footer.trim();
         return this;
     }
 

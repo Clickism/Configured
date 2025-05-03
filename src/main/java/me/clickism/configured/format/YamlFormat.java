@@ -1,5 +1,6 @@
 package me.clickism.configured.format;
 
+import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
 import me.clickism.configured.Configured;
 import org.jetbrains.annotations.NotNull;
@@ -61,18 +62,25 @@ public class YamlFormat extends ConfigFormat {
     }
 
     @Override
-    public void write(File file, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException {
+    public void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException {
+        File file = config.file();
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            StreamDataWriter streamDataWriter = new YamlOutputStreamWriter(outputStream, StandardCharsets.UTF_8) {
-                @Override
-                public void processIOException(IOException e) {
-                    Configured.LOGGER.log(Level.SEVERE, "Error while writing to config file: " + file.getPath(), e);
-                }
-            };
+            StreamDataWriter streamDataWriter = createStreamDataWriter(outputStream, file);
             Serializer serializer = new Serializer(dumpSettings, new Emitter(dumpSettings, streamDataWriter));
             serializer.emitStreamStart();
+            // Write header comment
+            String header = config.header();
+            if (writeComments && header != null) {
+                streamDataWriter.write(formatComment(header) + "\n\n");
+            }
+            // Write data
             MappingNode mappingNode = toMappingNode(data);
             serializer.serializeDocument(mappingNode);
+            // Write footer comment
+            String footer = config.footer();
+            if (writeComments && footer != null) {
+                streamDataWriter.write("\n\n" + formatComment(footer));
+            }
             serializer.emitStreamEnd();
         }
     }
@@ -102,5 +110,18 @@ public class YamlFormat extends ConfigFormat {
             nodes.add(new NodeTuple(keyNode, valueNode));
         }
         return new MappingNode(Tag.MAP, nodes, FlowStyle.BLOCK);
+    }
+
+    private static String formatComment(String comment) {
+        return "# " + comment.replaceAll("\n", "\n# ");
+    }
+
+    private static StreamDataWriter createStreamDataWriter(FileOutputStream outputStream, File file) {
+        return new YamlOutputStreamWriter(outputStream, StandardCharsets.UTF_8) {
+            @Override
+            public void processIOException(IOException e) {
+                Configured.LOGGER.log(Level.SEVERE, "Error while writing to config file: " + file.getPath(), e);
+            }
+        };
     }
 }

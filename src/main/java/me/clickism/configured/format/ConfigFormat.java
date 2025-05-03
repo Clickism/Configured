@@ -1,5 +1,6 @@
 package me.clickism.configured.format;
 
+import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
 
 import java.io.File;
@@ -32,11 +33,11 @@ public abstract class ConfigFormat {
     /**
      * Writes the data to a configuration file.
      *
-     * @param file the file to write to
-     * @param data the data to write
+     * @param config the config object
+     * @param data   the data to write
      * @throws IOException if an error occurs while writing the file
      */
-    public abstract void write(File file, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException;
+    public abstract void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException;
 
     /**
      * Sets whether to separate config options with line breaks.
