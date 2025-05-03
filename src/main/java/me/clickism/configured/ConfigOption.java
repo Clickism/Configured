@@ -26,6 +26,18 @@ public abstract class ConfigOption<T> {
     }
 
     /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @param <T>          the type of the config option
+     * @return the new config option
+     */
+    public static <T> ConfigOption<T> of(String key, T defaultValue) {
+        return new ConfigOption<>(key, defaultValue) {};
+    }
+
+    /**
      * Gets the key of the config option.
      *
      * @return the key of the config option
@@ -66,17 +78,5 @@ public abstract class ConfigOption<T> {
     @Override
     public int hashCode() {
         return key.hashCode();
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param <T>          the type of the config option
-     * @return the new config option
-     */
-    public static <T> ConfigOption<T> of(String key, T defaultValue) {
-        return new ConfigOption<>(key, defaultValue) {};
     }
 }

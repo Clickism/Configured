@@ -49,6 +49,19 @@ public class YamlFormat extends ConfigFormat {
         this.representer = new StandardRepresenter(dumpSettings);
     }
 
+    private static String formatComment(String comment) {
+        return "# " + comment.replaceAll("\n", "\n# ");
+    }
+
+    private static StreamDataWriter createStreamDataWriter(FileOutputStream outputStream, File file) {
+        return new YamlOutputStreamWriter(outputStream, StandardCharsets.UTF_8) {
+            @Override
+            public void processIOException(IOException e) {
+                Configured.LOGGER.log(Level.SEVERE, "Error while writing to config file: " + file.getPath(), e);
+            }
+        };
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> read(File file) throws IOException {
@@ -110,18 +123,5 @@ public class YamlFormat extends ConfigFormat {
             nodes.add(new NodeTuple(keyNode, valueNode));
         }
         return new MappingNode(Tag.MAP, nodes, FlowStyle.BLOCK);
-    }
-
-    private static String formatComment(String comment) {
-        return "# " + comment.replaceAll("\n", "\n# ");
-    }
-
-    private static StreamDataWriter createStreamDataWriter(FileOutputStream outputStream, File file) {
-        return new YamlOutputStreamWriter(outputStream, StandardCharsets.UTF_8) {
-            @Override
-            public void processIOException(IOException e) {
-                Configured.LOGGER.log(Level.SEVERE, "Error while writing to config file: " + file.getPath(), e);
-            }
-        };
     }
 }

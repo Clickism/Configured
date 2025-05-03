@@ -34,6 +34,28 @@ public class Config {
     }
 
     /**
+     * Creates a new Config instance with the YAML format.
+     *
+     * @param file the file to read/write the config from/to
+     * @return the new Config instance
+     */
+    public static Config ofYaml(File file) {
+        return new Config(new YamlFormat(), file);
+    }
+
+    // TODO: Error checking or specific function for when the option is not registered in the config
+
+    /**
+     * Creates a new Config instance with the YAML format.
+     *
+     * @param filePath the path to the file to read/write the config from/to
+     * @return the new Config instance
+     */
+    public static Config ofYaml(String filePath) {
+        return new Config(new YamlFormat(), new File(filePath));
+    }
+
+    /**
      * Registers a new option in the config.
      *
      * @param option the option to register
@@ -48,8 +70,6 @@ public class Config {
         data.put(option.key(), option.defaultValue());
         return option;
     }
-
-    // TODO: Error checking or specific function for when the option is not registered in the config
 
     /**
      * Gets the value of an option, or the default value if it is not set.
@@ -206,25 +226,5 @@ public class Config {
     public Config footer(String footer) {
         this.footer = footer.trim();
         return this;
-    }
-
-    /**
-     * Creates a new Config instance with the YAML format.
-     *
-     * @param file the file to read/write the config from/to
-     * @return the new Config instance
-     */
-    public static Config ofYaml(File file) {
-        return new Config(new YamlFormat(), file);
-    }
-
-    /**
-     * Creates a new Config instance with the YAML format.
-     *
-     * @param filePath the path to the file to read/write the config from/to
-     * @return the new Config instance
-     */
-    public static Config ofYaml(String filePath) {
-        return new Config(new YamlFormat(), new File(filePath));
     }
 }
