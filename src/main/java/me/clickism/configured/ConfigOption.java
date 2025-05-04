@@ -88,7 +88,7 @@ public abstract class ConfigOption<T> {
      * @return this config option
      */
     public ConfigOption<T> description(String description) {
-        this.description = description;
+        this.description = description.trim();
         return this;
     }
 
@@ -156,7 +156,7 @@ public abstract class ConfigOption<T> {
      * @return this config option
      */
     public ConfigOption<T> header(String header) {
-        this.header = header;
+        this.header = header.trim();
         return this;
     }
 
@@ -176,7 +176,7 @@ public abstract class ConfigOption<T> {
      * @return this config option
      */
     public ConfigOption<T> footer(String footer) {
-        this.footer = footer;
+        this.footer = footer.trim();
         return this;
     }
 
