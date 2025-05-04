@@ -14,6 +14,9 @@ public abstract class ConfigOption<T> {
     private final T defaultValue;
     private @Nullable String description;
 
+    private @Nullable String header;
+    private @Nullable String footer;
+
     /**
      * Creates a new config option.
      *
@@ -72,6 +75,46 @@ public abstract class ConfigOption<T> {
      */
     public ConfigOption<T> description(String description) {
         this.description = description;
+        return this;
+    }
+
+    /**
+     * Gets the header of the config option.
+     *
+     * @return the header of the config option, or null if not set
+     */
+    public @Nullable String header() {
+        return header;
+    }
+
+    /**
+     * Sets the header of the config option.
+     *
+     * @param header the header of the config option
+     * @return this config option
+     */
+    public ConfigOption<T> header(String header) {
+        this.header = header;
+        return this;
+    }
+
+    /**
+     * Gets the footer of the config option.
+     *
+     * @return the footer of the config option, or null if not set
+     */
+    public @Nullable String footer() {
+        return footer;
+    }
+
+    /**
+     * Sets the footer of the config option.
+     *
+     * @param footer the footer of the config option
+     * @return this config option
+     */
+    public ConfigOption<T> footer(String footer) {
+        this.footer = footer;
         return this;
     }
 

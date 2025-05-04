@@ -3,7 +3,6 @@ package me.clickism.configured.format;
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
 import me.clickism.configured.Configured;
-import org.jetbrains.annotations.NotNull;
 import org.snakeyaml.engine.v2.api.*;
 import org.snakeyaml.engine.v2.comments.CommentLine;
 import org.snakeyaml.engine.v2.comments.CommentType;
@@ -30,9 +29,8 @@ import java.util.logging.Level;
  */
 public class YamlFormat extends ConfigFormat {
 
-    private static final List<@NotNull CommentLine> LINE_BREAK_COMMENT = List.of(
-            new CommentLine(Optional.empty(), Optional.empty(), "", CommentType.BLANK_LINE)
-    );
+    private static final CommentLine LINE_BREAK_COMMENT =
+            new CommentLine(Optional.empty(), Optional.empty(), "", CommentType.BLANK_LINE);
 
     private final Load load;
     private final DumpSettings dumpSettings;
@@ -43,14 +41,20 @@ public class YamlFormat extends ConfigFormat {
      */
     public YamlFormat() {
         this.load = new Load(LoadSettings.builder().build());
-        this.dumpSettings = DumpSettings.builder()
-                .setDumpComments(true)
-                .build();
+        this.dumpSettings = DumpSettings.builder().setDumpComments(true).build();
         this.representer = new StandardRepresenter(dumpSettings);
     }
 
     private static String formatComment(String comment) {
         return "# " + comment.replaceAll("\n", "\n# ");
+    }
+
+    private static List<CommentLine> formatCommentLines(String comment) {
+        if (comment == null) return List.of();
+        return Arrays.stream(comment.split("\n"))
+                .map(line -> new CommentLine(Optional.empty(), Optional.empty(),
+                        " " + line, CommentType.BLOCK))
+                .toList();
     }
 
     private static StreamDataWriter createStreamDataWriter(FileOutputStream outputStream, File file) {
@@ -107,21 +111,42 @@ public class YamlFormat extends ConfigFormat {
             Object value = entry.getValue();
 
             Node keyNode = representer.represent(option.key());
-            // Add description comment
-            String description = option.description();
-            if (writeComments && description != null) {
-                keyNode.setBlockComments(Arrays.stream(description.split("\n"))
-                        .map(line -> new CommentLine(Optional.empty(), Optional.empty(), " " + line, CommentType.BLOCK))
-                        .toList());
-            }
             Node valueNode = representer.represent(value);
-            // Add line break comment
-            if (separateConfigOptions && iterator.hasNext()) {
-                valueNode.setEndComments(LINE_BREAK_COMMENT);
-            }
-            // Add node to the list
+            // Add comments
+            keyNode.setBlockComments(getBlockComments(option));
+            boolean addLineBreak = separateConfigOptions && iterator.hasNext();
+            valueNode.setEndComments(getEndComments(option, addLineBreak));
+
             nodes.add(new NodeTuple(keyNode, valueNode));
         }
         return new MappingNode(Tag.MAP, nodes, FlowStyle.BLOCK);
+    }
+
+    private List<CommentLine> getBlockComments(ConfigOption<?> option) {
+        if (!writeComments) return List.of();
+        List<CommentLine> comments = new ArrayList<>();
+        String header = option.header();
+        String description = option.description();
+        if (header != null) {
+            comments.addAll(formatCommentLines(header));
+            comments.add(LINE_BREAK_COMMENT);
+        }
+        if (description != null) {
+            comments.addAll(formatCommentLines(description));
+        }
+        return comments;
+    }
+
+    private List<CommentLine> getEndComments(ConfigOption<?> option, boolean addLineBreak) {
+        List<CommentLine> comments = new ArrayList<>();
+        String footer = option.footer();
+        if (writeComments && footer != null) {
+            comments.add(LINE_BREAK_COMMENT);
+            comments.addAll(formatCommentLines(footer));
+        }
+        if (addLineBreak) {
+            comments.add(LINE_BREAK_COMMENT);
+        }
+        return comments;
     }
 }
