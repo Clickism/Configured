@@ -84,4 +84,34 @@ public class CommentTests {
                 # This is a footer comment
                 """, string);
     }
+
+    @Test
+    public void testOptionHeaderAndFooter(@TempDir Path tempDir) throws IOException {
+        Path path = tempDir.resolve("config.yml");
+        Config config = Config.ofYaml(path.toFile());
+        config.register(ConfigOption.of("name", "Hello")
+                .description("Name of the player"));
+        config.register(ConfigOption.of("test", 5)
+                .header("Test header")
+                .description("Test value\nDefault: 5")
+                .footer("Test footer"));
+        config.register(ConfigOption.of("enabled", true));
+        config.save();
+
+        String string = Files.readString(path);
+        assertEquals("""
+                # Name of the player
+                name: Hello
+                
+                # Test header
+                
+                # Test value
+                # Default: 5
+                test: 5
+                
+                # Test footer
+                
+                enabled: true
+                """, string);
+    }
 }
