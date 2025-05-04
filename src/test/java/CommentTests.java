@@ -126,7 +126,9 @@ public class CommentTests {
         config.register(ConfigOption.of("name", "Player")
                 .appendDefaultValue());
         config.register(ConfigOption.of("enabled", true)
-                .description("Boolean value.")
+                .description("""
+                        Boolean value.
+                        """)
                 .appendInlinedDefaultValue());
         config.register(ConfigOption.of("pi", 3.14)
                 .description("Pi constant")
