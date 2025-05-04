@@ -112,6 +112,11 @@ public class Config {
      */
     public void load() {
         try {
+            if (!file.exists()) {
+                save();
+                // Not necessary to load
+                return;
+            }
             data = format.read(file);
         } catch (IOException e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
