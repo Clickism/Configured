@@ -13,8 +13,11 @@ import java.util.logging.Level;
  * Represents a configuration file.
  */
 public class Config {
+    private static final ConfigOption<Integer> VERSION_OPTION = ConfigOption.of("_version", 0);
+
     private final ConfigFormat format;
     private final File file;
+    private @Nullable Integer version;
 
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
     private Map<String, Object> data = new HashMap<>();
@@ -118,9 +121,25 @@ public class Config {
                 return;
             }
             data = format.read(file);
+            if (hasOlderVersion()) {
+                Configured.LOGGER.info("Config file '" + file.getPath() + "' has a different version. Saving current version.");
+                set(VERSION_OPTION, version);
+                save();
+            }
         } catch (IOException e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
         }
+    }
+
+    /**
+     * Check if the loaded config file has an older version than the current version.
+     *
+     * @return true if the loaded config file has an older version, false otherwise
+     */
+    private boolean hasOlderVersion() {
+        if (version == null) return false;
+        int fileVersion = get(VERSION_OPTION);
+        return fileVersion != version;
     }
 
     /**
@@ -168,7 +187,11 @@ public class Config {
      * @return this Config instance
      */
     public Config version(int version) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        this.version = version;
+        if (!options.contains(VERSION_OPTION)) {
+            register(VERSION_OPTION);
+        }
+        return this;
     }
 
     /**
