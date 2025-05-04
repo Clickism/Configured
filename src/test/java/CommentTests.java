@@ -6,6 +6,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -113,5 +114,47 @@ public class CommentTests {
                 
                 enabled: true
                 """, string);
+    }
+
+    @Test
+    public void testAppendDefaultValue(@TempDir Path tempDir) throws IOException {
+        Path path = tempDir.resolve("config.yml");
+        Config config = Config.ofYaml(path.toFile());
+        config.register(ConfigOption.of("test", 5)
+                .description("Test value")
+                .appendDefaultValue());
+        config.register(ConfigOption.of("name", "Player")
+                .appendDefaultValue());
+        config.register(ConfigOption.of("enabled", true)
+                .description("Boolean value.")
+                .appendInlinedDefaultValue());
+        config.register(ConfigOption.of("pi", 3.14)
+                .description("Pi constant")
+                .appendParenthesizedDefaultValue());
+        config.register(ConfigOption.of("list", List.of("a", "b", "c"))
+                .appendDefaultValue());
+        config.save();
+
+        String string = Files.readString(path);
+        assertEquals(
+                """
+                        # Test value
+                        # Default: 5
+                        test: 5
+                        
+                        # Default: Player
+                        name: Player
+                        
+                        # Boolean value. Default: true
+                        enabled: true
+                        
+                        # Pi constant (Default: 3.14)
+                        pi: 3.14
+                        
+                        # Default: [a, b, c]
+                        list: [a, b, c]
+                        """, string
+        );
+
     }
 }
