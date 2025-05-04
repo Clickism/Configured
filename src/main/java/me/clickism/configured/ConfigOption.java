@@ -2,6 +2,9 @@ package me.clickism.configured;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Represents a config option.
  * <p>
@@ -40,6 +43,17 @@ public abstract class ConfigOption<T> {
         return new ConfigOption<>(key, defaultValue) {};
     }
 
+    private static String formatDefaultValue(Object defaultValue) {
+        if (defaultValue instanceof List<?> list) {
+            return "[" +
+                   list.stream()
+                           .map(ConfigOption::formatDefaultValue)
+                           .collect(Collectors.joining(", "))
+                   + "]";
+        }
+        return String.valueOf(defaultValue);
+    }
+
     /**
      * Gets the key of the config option.
      *
@@ -76,6 +90,54 @@ public abstract class ConfigOption<T> {
     public ConfigOption<T> description(String description) {
         this.description = description;
         return this;
+    }
+
+    /**
+     * Appends the default value to the current description of the config option.
+     *
+     * @return this config option
+     */
+    public ConfigOption<T> appendDefaultValue() {
+        if (description != null) {
+            description += "\n";
+        }
+        appendDefaultValueInternal();
+        return this;
+    }
+
+    /**
+     * Appends the default value to the current description of the config option inlined,
+     * without a new line.
+     *
+     * @return this config option
+     */
+    public ConfigOption<T> appendInlinedDefaultValue() {
+        if (description != null) {
+            description += " ";
+        }
+        appendDefaultValueInternal();
+        return this;
+    }
+
+    /**
+     * Appends the default value to the current description of the config option in parentheses
+     * and inlined, without a new line.
+     *
+     * @return this config option
+     */
+    public ConfigOption<T> appendParenthesizedDefaultValue() {
+        if (description != null) {
+            description += " ";
+        }
+        description += "(";
+        appendDefaultValueInternal();
+        description += ")";
+        return this;
+    }
+
+    private void appendDefaultValueInternal() {
+        String string = description == null ? "" : description;
+        description = string + "Default: " + formatDefaultValue(defaultValue);
     }
 
     /**

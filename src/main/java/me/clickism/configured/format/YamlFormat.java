@@ -41,7 +41,9 @@ public class YamlFormat extends ConfigFormat {
      */
     public YamlFormat() {
         this.load = new Load(LoadSettings.builder().build());
-        this.dumpSettings = DumpSettings.builder().setDumpComments(true).build();
+        this.dumpSettings = DumpSettings.builder()
+                .setDumpComments(true)
+                .build();
         this.representer = new StandardRepresenter(dumpSettings);
     }
 
