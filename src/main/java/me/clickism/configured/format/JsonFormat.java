@@ -53,11 +53,11 @@ public class JsonFormat extends ConfigFormat {
          * <p>
          * The implementation is based on the Jackson library and supports
          * most of the JSON5 standard except for:
+         * </p>
          * <ul>
          *     <li>Multi-line strings</li>
          *     <li>Hexadecimal numbers</li>
          * </ul>
-         * </p>
          */
         JSON5;
 
