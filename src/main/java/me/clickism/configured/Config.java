@@ -298,6 +298,11 @@ public class Config {
      * Sets the config version of the config file.
      * Used for versioning the config file format.
      *
+     * <p>
+     * <strong>Warning:</strong> This will register a new option with the key
+     * <strong>"_version"</strong> if it doesn't exist or (possibly) overwrite it if it does.
+     * </p>
+     *
      * @param version the version to set
      * @return this Config instance
      */
