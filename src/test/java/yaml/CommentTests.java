@@ -1,3 +1,5 @@
+package yaml;
+
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
 import org.junit.jupiter.api.Test;
