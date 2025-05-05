@@ -9,9 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SaveLoadTests {
     private void assertSaveAndLoad(Config config) {
-        ConfigOption<String> name = config.register(ConfigOption.of("name", "John Doe"));
-        ConfigOption<Integer> age = config.register(ConfigOption.of("age", 5));
-        ConfigOption<Boolean> enabled = config.register(ConfigOption.of("enabled", true));
+        ConfigOption<String> name = config.register(ConfigOption.of("name", "John Doe")
+                .description("Test Description"));
+        ConfigOption<Integer> age = config.register(ConfigOption.of("age", 5)
+                .description("Test Description"));
+        ConfigOption<Boolean> enabled = config.register(ConfigOption.of("enabled", true)
+                .description("Test Description"));
         config.load();
         config.set(name, "Jane Doe");
         config.set(age, 10);
