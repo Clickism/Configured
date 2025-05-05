@@ -241,7 +241,7 @@ public class Config {
                 set(VERSION_OPTION, version);
                 save();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
         }
     }
@@ -280,7 +280,7 @@ public class Config {
                 file.createNewFile();
             }
             format.write(this, dataToSave);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to save config file: " + file.getAbsolutePath(), e);
         }
     }

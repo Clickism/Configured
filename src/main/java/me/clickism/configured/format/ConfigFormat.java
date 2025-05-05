@@ -28,7 +28,7 @@ public abstract class ConfigFormat {
      * @return the data as a map
      * @throws IOException if an error occurs while reading the file
      */
-    public abstract Map<String, Object> read(File file) throws IOException;
+    public abstract Map<String, Object> read(File file) throws Exception;
 
     /**
      * Writes the data to a configuration file.
@@ -37,7 +37,7 @@ public abstract class ConfigFormat {
      * @param data   the data to write
      * @throws IOException if an error occurs while writing the file
      */
-    public abstract void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException;
+    public abstract void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws Exception;
 
     /**
      * Sets whether to separate config options with line breaks.

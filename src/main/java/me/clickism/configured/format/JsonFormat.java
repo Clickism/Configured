@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,64 +103,64 @@ public class JsonFormat extends ConfigFormat {
     }
 
     @Override
-    public void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException {
+    public void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
-        String configHeader = config.header();
-        if (writeComments && configHeader != null) {
-            sb.append(formatComment(configHeader)).append("\n\n");
-        }
-        try {
-            Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<ConfigOption<?>, Object> entry = iterator.next();
-                ConfigOption<?> option = entry.getKey();
-                Object value = entry.getValue();
-                // Write header
-                String header = option.header();
-                if (header != null) {
-                    sb.append(formatComment(header)).append("\n\n");
-                }
-                // Write description
-                String description = option.description();
-                if (writeComments && description != null) {
-                    sb.append(formatComment(description)).append('\n');
-                }
-                String valueString = mapper.writeValueAsString(value);
-                sb.append("\t\"").append(option.key()).append("\": ").append(valueString);
-                if (iterator.hasNext()) {
-                    sb.append(',');
-                }
-                sb.append('\n');
-                // Write footer
-                String footer = option.footer();
-                if (footer != null) {
-                    sb.append('\n').append(formatComment(footer)).append('\n');
-                }
-                // Add line break if more options
-                if (iterator.hasNext() && separateConfigOptions) {
-                    sb.append('\n');
-                }
-            }
-        } catch (Exception e) {
-            throw new IOException("Failed to write config file: " + config.file().getPath() +
-                                  ". JSON type: " + type.name(), e);
-        }
-        String configFooter = config.footer();
-        if (writeComments && configFooter != null) {
-            sb.append('\n').append(formatComment(configFooter)).append('\n');
-        }
+        writeHeader(sb, config.header());
+        writeData(sb, data);
+        writeFooter(sb, config.footer());
         sb.append('}');
         String string = sb.toString();
         Files.writeString(config.file().toPath(), string);
+    }
+
+    private void writeData(StringBuilder sb,
+                           List<Map.Entry<ConfigOption<?>, Object>> data) throws Exception {
+        Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<ConfigOption<?>, Object> entry = iterator.next();
+            ConfigOption<?> option = entry.getKey();
+            Object value = entry.getValue();
+            writeConfigOption(sb, option, value, iterator.hasNext());
+        }
+    }
+
+    private void writeConfigOption(StringBuilder sb, ConfigOption<?> option,
+                                   Object value, boolean hasNext) throws Exception {
+        writeHeader(sb, option.header());
+        // Write description
+        String description = option.description();
+        if (writeComments && description != null) {
+            sb.append(formatComment(description)).append('\n');
+        }
+        String valueString = mapper.writeValueAsString(value);
+        sb.append("\t\"").append(option.key()).append("\": ").append(valueString);
+        if (hasNext) {
+            sb.append(',');
+        }
+        sb.append('\n');
+        writeFooter(sb, option.footer());
+        // Add line break if more options
+        if (hasNext && separateConfigOptions) {
+            sb.append('\n');
+        }
+    }
+
+    private void writeHeader(StringBuilder sb, @Nullable String header) {
+        if (!writeComments || header == null) return;
+        sb.append(formatComment(header)).append("\n\n");
+    }
+
+    private void writeFooter(StringBuilder sb, @Nullable String footer) {
+        if (!writeComments || footer == null) return;
+        sb.append('\n').append(formatComment(footer)).append('\n');
     }
 
     private void setupForType(JsonType type) {
         switch (type) {
             case JSON -> {
                 writeComments(false);
-                // Make compact by default
-                separateConfigOptions(false);
+                separateConfigOptions(false); // Make compact by default
             }
             case JSONC -> {
                 jsonFactory.enable(JsonParser.Feature.ALLOW_COMMENTS);
