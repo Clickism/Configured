@@ -105,9 +105,9 @@ public class JsonFormat extends ConfigFormat {
     public void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
-        String header = config.header();
-        if (writeComments && header != null) {
-            sb.append(formatComment(header)).append("\n\n");
+        String configHeader = config.header();
+        if (writeComments && configHeader != null) {
+            sb.append(formatComment(configHeader)).append("\n\n");
         }
         try {
             Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.iterator();
@@ -115,6 +115,12 @@ public class JsonFormat extends ConfigFormat {
                 Map.Entry<ConfigOption<?>, Object> entry = iterator.next();
                 ConfigOption<?> option = entry.getKey();
                 Object value = entry.getValue();
+                // Write header
+                String header = option.header();
+                if (header != null) {
+                    sb.append(formatComment(header)).append("\n\n");
+                }
+                // Write description
                 String description = option.description();
                 if (writeComments && description != null) {
                     sb.append(formatComment(description)).append('\n');
@@ -123,21 +129,27 @@ public class JsonFormat extends ConfigFormat {
                 sb.append("\t\"").append(option.key()).append("\": ").append(valueString);
                 if (iterator.hasNext()) {
                     sb.append(',');
-                    if (separateConfigOptions) {
-                        sb.append("\n");
-                    }
                 }
                 sb.append('\n');
+                // Write footer
+                String footer = option.footer();
+                if (footer != null) {
+                    sb.append('\n').append(formatComment(footer)).append('\n');
+                }
+                // Add line break if more options
+                if (iterator.hasNext() && separateConfigOptions) {
+                    sb.append('\n');
+                }
             }
         } catch (Exception e) {
             throw new IOException("Failed to write config file: " + config.file().getPath() +
                                   ". JSON type: " + type.name(), e);
         }
-        String footer = config.footer();
-        if (writeComments && footer != null) {
-            sb.append(formatComment(footer)).append("\n");
+        String configFooter = config.footer();
+        if (writeComments && configFooter != null) {
+            sb.append('\n').append(formatComment(configFooter)).append('\n');
         }
-        sb.append("}");
+        sb.append('}');
         String string = sb.toString();
         Files.writeString(config.file().toPath(), string);
     }
