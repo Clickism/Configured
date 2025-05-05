@@ -17,6 +17,7 @@ java {
 dependencies {
     // Serialization
     implementation("org.snakeyaml:snakeyaml-engine:2.9")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
 
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.0")
