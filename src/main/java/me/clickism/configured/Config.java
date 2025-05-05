@@ -100,14 +100,27 @@ public class Config {
      * Sets the value of an option.
      *
      * @param option the option to set
-     * @param value  the value to set
+     * @param value  the value to set, or null to use the default value
      * @param <T>    the type of the option
      */
-    public <T> void set(ConfigOption<T> option, T value) {
+    public <T> void set(ConfigOption<T> option, @Nullable T value) {
         if (!options.contains(option)) {
             throw new IllegalArgumentException("Option '" + option.key() + "' is not registered");
         }
+        if (value == null) {
+            data.remove(option.key());
+            return;
+        }
         data.put(option.key(), value);
+    }
+
+    /**
+     * Resets the value of an option to its default value.
+     *
+     * @param option the option to reset
+     */
+    public void reset(ConfigOption<?> option) {
+        set(option, null);
     }
 
     /**
@@ -117,6 +130,8 @@ public class Config {
     public void load() {
         try {
             if (!file.exists()) {
+                // Set the version to the current version
+                set(VERSION_OPTION, version);
                 save();
                 // Not necessary to load
                 return;
