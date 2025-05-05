@@ -13,6 +13,7 @@ import java.util.logging.Level;
  * Represents a configuration file.
  */
 public class Config {
+    // TODO: Maybe add a way to add warning to not change the version
     private static final ConfigOption<Integer> VERSION_OPTION = ConfigOption.of("_version", 0);
 
     private final ConfigFormat format;
@@ -157,7 +158,7 @@ public class Config {
         // Save the data to the file
         try {
             File parentFile = file.getParentFile();
-            if (!parentFile.exists()) {
+            if (parentFile != null && !parentFile.exists()) {
                 parentFile.mkdirs();
             }
             if (!file.exists()) {
