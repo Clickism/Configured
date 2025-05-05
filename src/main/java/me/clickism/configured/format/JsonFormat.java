@@ -11,7 +11,7 @@ import me.clickism.configured.ConfigOption;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +58,11 @@ public class JsonFormat extends ConfigFormat {
          * </ul>
          * </p>
          */
-        JSON5
+        JSON5;
+
+        private boolean allowsComments() {
+            return this == JSONC || this == JSON5;
+        }
     }
 
     private final JsonType type;
@@ -73,7 +77,7 @@ public class JsonFormat extends ConfigFormat {
      */
     public JsonFormat(JsonType type) {
         this.type = type;
-        enableFeaturesFor(type);
+        setupForType(type);
     }
 
     @Override
@@ -88,20 +92,66 @@ public class JsonFormat extends ConfigFormat {
         }
     }
 
+    private static String formatComment(String comment) {
+        return "\t// " + comment.replaceAll("\n", "\n\t// ");
+    }
+
+    @Override
+    public void writeComments(boolean writeComments) {
+        super.writeComments(writeComments && type.allowsComments());
+    }
+
     @Override
     public void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws IOException {
-        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-        data.forEach(entry -> {
-            map.put(entry.getKey().key(), entry.getValue());
-        });
-
-        String string = mapper.writeValueAsString(map);
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        String header = config.header();
+        if (writeComments && header != null) {
+            sb.append(formatComment(header)).append("\n\n");
+        }
+        try {
+            Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<ConfigOption<?>, Object> entry = iterator.next();
+                ConfigOption<?> option = entry.getKey();
+                Object value = entry.getValue();
+                String description = option.description();
+                if (writeComments && description != null) {
+                    sb.append(formatComment(description)).append('\n');
+                }
+                String valueString = mapper.writeValueAsString(value);
+                sb.append("\t\"").append(option.key()).append("\": ").append(valueString);
+                if (iterator.hasNext()) {
+                    sb.append(',');
+                    if (separateConfigOptions) {
+                        sb.append("\n");
+                    }
+                }
+                sb.append('\n');
+            }
+        } catch (Exception e) {
+            throw new IOException("Failed to write config file: " + config.file().getPath() +
+                                  ". JSON type: " + type.name(), e);
+        }
+        String footer = config.footer();
+        if (writeComments && footer != null) {
+            sb.append(formatComment(footer)).append("\n");
+        }
+        sb.append("}");
+        String string = sb.toString();
         Files.writeString(config.file().toPath(), string);
     }
 
-    private void enableFeaturesFor(JsonType type) {
+    private void setupForType(JsonType type) {
         switch (type) {
-            case JSONC -> jsonFactory.enable(JsonParser.Feature.ALLOW_COMMENTS);
+            case JSON -> {
+                writeComments(false);
+                // Make compact by default
+                separateConfigOptions(false);
+            }
+            case JSONC -> {
+                jsonFactory.enable(JsonParser.Feature.ALLOW_COMMENTS);
+            }
             case JSON5 -> {
                 jsonFactory.enable(JsonParser.Feature.ALLOW_COMMENTS);
                 jsonFactory.enable(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES.mappedFeature());
