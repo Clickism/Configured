@@ -72,8 +72,8 @@ Which will generate a `config.json5` file like this:
 	"age": 18,
 
 	// Whether the user is a student or not
-	// Default: true
-	"student": true
+	// Default: false
+	"student": false
 }
 ```
 You can then access/overwrite config values like this:
