@@ -12,23 +12,20 @@ public static final Config CONFIG = Config.ofYaml("config.yml")
                 Generated using Configured!
                 """);
 
-public static final ConfigOption<String> NAME = CONFIG.register(
-        ConfigOption.of("name", "John Smith")
+public static final ConfigOption<String> NAME = 
+        CONFIG.optionOf("name", "John Smith")
                 .description("Name of the user")
-                .appendDefaultValue()
-);
+                .appendDefaultValue();
 
-public static final ConfigOption<Integer> AGE = CONFIG.register(
-        ConfigOption.of("age", 18)
+public static final ConfigOption<Integer> AGE =
+        CONFIG.optionOf("age", 18)
                 .description("Age of the user")
-                .appendDefaultValue()
-);
+                .appendDefaultValue();
 
-public static final ConfigOption<Boolean> STUDENT = CONFIG.register(
-        ConfigOption.of("student", false)
+public static final ConfigOption<Boolean> STUDENT =
+        CONFIG.optionOf("student", true)
                 .description("Whether the user is a student or not")
-                .appendDefaultValue()
-);
+                .appendDefaultValue();
 
 public static void main(String[] args) {
     CONFIG.load();
@@ -52,6 +49,31 @@ age: 18
 # Whether the user is a student or not
 # Default: false
 student: false
+```
+You can change the config format to JSON5 like this:
+```java
+Config.ofJson5("config.json5")
+```
+Which will generate a `config.json5` file like this:
+```json5
+{
+	// Example configuration file
+	// Using "Configured"!
+
+	"_version": 0,
+
+	// Name of the user
+	// Default: John Smith
+	"name": "John Smith",
+
+	// Age of the user
+	// Default: 18
+	"age": 18,
+
+	// Whether the user is a student or not
+	// Default: true
+	"student": true
+}
 ```
 You can then access/overwrite config values like this:
 ```java
