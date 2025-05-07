@@ -33,7 +33,7 @@ import java.util.Map;
  * JSON5: This format allows for more relaxed syntax rules, such as unquoted keys and
  * </p>
  */
-public class JsonFormat extends ConfigFormat {
+public class JsonFormat extends BaseFormat {
 
     /**
      * Enum representing the supported JSON flavors.
@@ -99,68 +99,35 @@ public class JsonFormat extends ConfigFormat {
         }
     }
 
-    private static String formatComment(String comment) {
+    @Override
+    public String formatComment(String comment) {
         return "\t// " + comment.replaceAll("\n", "\n\t// ");
+    }
+
+    @Override
+    protected void writeKeyValue(StringBuilder sb, String key,
+                                 Object value, boolean hasNext) throws Exception {
+        String string = mapper.writeValueAsString(value)
+                .replaceAll("\n", "\n\t");
+        sb.append("\t\"").append(key).append("\": ").append(string);
+        if (hasNext) {
+            sb.append(',');
+        }
+    }
+
+    @Override
+    protected void writeFormatHeader(StringBuilder sb) {
+        sb.append("{\n");
+    }
+
+    @Override
+    protected void writeFormatFooter(StringBuilder sb) {
+        sb.append('}');
     }
 
     @Override
     public void writeComments(boolean writeComments) {
         super.writeComments(writeComments && type.allowsComments());
-    }
-
-    @Override
-    public void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\n");
-        writeHeader(sb, config.header());
-        writeData(sb, data);
-        writeFooter(sb, config.footer());
-        sb.append('}');
-        String string = sb.toString();
-        Files.writeString(config.file().toPath(), string);
-    }
-
-    private void writeData(StringBuilder sb,
-                           List<Map.Entry<ConfigOption<?>, Object>> data) throws Exception {
-        Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<ConfigOption<?>, Object> entry = iterator.next();
-            ConfigOption<?> option = entry.getKey();
-            Object value = entry.getValue();
-            writeConfigOption(sb, option, value, iterator.hasNext());
-        }
-    }
-
-    private void writeConfigOption(StringBuilder sb, ConfigOption<?> option,
-                                   Object value, boolean hasNext) throws Exception {
-        writeHeader(sb, option.header());
-        // Write description
-        String description = option.description();
-        if (writeComments && description != null) {
-            sb.append(formatComment(description)).append('\n');
-        }
-        String valueString = mapper.writeValueAsString(value);
-        valueString = valueString.replaceAll("\n", "\n\t");
-        sb.append("\t\"").append(option.key()).append("\": ").append(valueString);
-        if (hasNext) {
-            sb.append(',');
-        }
-        sb.append('\n');
-        writeFooter(sb, option.footer());
-        // Add line break if more options
-        if (hasNext && separateConfigOptions) {
-            sb.append('\n');
-        }
-    }
-
-    private void writeHeader(StringBuilder sb, @Nullable String header) {
-        if (!writeComments || header == null) return;
-        sb.append(formatComment(header)).append("\n\n");
-    }
-
-    private void writeFooter(StringBuilder sb, @Nullable String footer) {
-        if (!writeComments || footer == null) return;
-        sb.append('\n').append(formatComment(footer)).append('\n');
     }
 
     private void setupForType(JsonType type) {
