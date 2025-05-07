@@ -3,6 +3,8 @@ package me.clickism.configured.format;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.core.util.Separators;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import me.clickism.configured.Config;
@@ -69,7 +71,10 @@ public class JsonFormat extends ConfigFormat {
     private final JsonType type;
     private final JsonFactory jsonFactory = new JsonFactory();
     private final ObjectMapper mapper = new ObjectMapper(jsonFactory)
-            .enable(SerializationFeature.INDENT_OUTPUT);
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .setDefaultPrettyPrinter(new DefaultPrettyPrinter()
+                    .withSeparators(Separators.createDefaultInstance()
+                            .withObjectFieldValueSpacing(Separators.Spacing.AFTER)));
 
     /**
      * Creates a new JsonFormat instance with the specified JSON type.
@@ -81,6 +86,7 @@ public class JsonFormat extends ConfigFormat {
         setupForType(type);
     }
 
+    // TODO: Format specific default value formatting
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> read(File file) throws IOException {
@@ -134,6 +140,7 @@ public class JsonFormat extends ConfigFormat {
             sb.append(formatComment(description)).append('\n');
         }
         String valueString = mapper.writeValueAsString(value);
+        valueString = valueString.replaceAll("\n", "\n\t");
         sb.append("\t\"").append(option.key()).append("\": ").append(valueString);
         if (hasNext) {
             sb.append(',');
