@@ -2,7 +2,8 @@ import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
 
 public class ConfiguredExample {
-    public static final Config CONFIG = Config.ofYaml("config.yml")
+    public static final Config CONFIG =
+            Config.ofYaml("config.yml")
                     .version(1)
                     .header("""
                             Example configuration file
@@ -20,7 +21,7 @@ public class ConfiguredExample {
                     .appendDefaultValue();
 
     public static final ConfigOption<Boolean> STUDENT =
-            CONFIG.optionOf("student", true)
+            CONFIG.optionOf("student", false)
                     .description("Whether the user is a student or not")
                     .appendDefaultValue();
 
