@@ -30,7 +30,6 @@ public class CommentTests {
                 # ------
                 # This is a header comment
                 
-                {}
                 """, string);
     }
 
@@ -47,7 +46,6 @@ public class CommentTests {
 
         String string = Files.readString(path);
         assertEquals("""
-                {}
                 
                 # FOOTER
                 # ------
@@ -69,7 +67,8 @@ public class CommentTests {
                 ------
                 This is a footer comment
                 """);
-        config.register(ConfigOption.of("test", 5).description("Test value\nDefault: 5"));
+        config.optionOf("test", 5)
+                .description("Test value\nDefault: 5");
         config.save();
 
         String string = Files.readString(path);
@@ -92,13 +91,13 @@ public class CommentTests {
     public void testOptionHeaderAndFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
         Config config = Config.ofYaml(path.toFile());
-        config.register(ConfigOption.of("name", "Hello")
-                .description("Name of the player"));
+        config.optionOf("name", "Hello")
+                .description("Name of the player");
         config.register(ConfigOption.of("test", 5)
                 .header("Test header")
                 .description("Test value\nDefault: 5")
                 .footer("Test footer"));
-        config.register(ConfigOption.of("enabled", true));
+        config.optionOf("enabled", true);
         config.save();
 
         String string = Files.readString(path);
@@ -122,21 +121,21 @@ public class CommentTests {
     public void testAppendDefaultValue(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
         Config config = Config.ofYaml(path.toFile());
-        config.register(ConfigOption.of("test", 5)
+        config.optionOf("test", 5)
                 .description("Test value")
-                .appendDefaultValue());
-        config.register(ConfigOption.of("name", "Player")
-                .appendDefaultValue());
-        config.register(ConfigOption.of("enabled", true)
+                .appendDefaultValue();
+        config.optionOf("name", "Player")
+                .appendDefaultValue();
+        config.optionOf("enabled", true)
                 .description("""
                         Boolean value.
                         """)
-                .appendInlinedDefaultValue());
-        config.register(ConfigOption.of("pi", 3.14)
+                .appendInlinedDefaultValue();
+        config.optionOf("pi", 3.14)
                 .description("Pi constant")
-                .appendParenthesizedDefaultValue());
-        config.register(ConfigOption.of("list", List.of("a", "b", "c"))
-                .appendDefaultValue());
+                .appendParenthesizedDefaultValue();
+        config.optionOf("list", List.of("a", "b", "c"))
+                .appendDefaultValue();
         config.save();
 
         String string = Files.readString(path);
@@ -156,9 +155,11 @@ public class CommentTests {
                         pi: 3.14
                         
                         # Default: [a, b, c]
-                        list: [a, b, c]
+                        list:
+                         - a
+                         - b
+                         - c
                         """, string
         );
-
     }
 }

@@ -20,31 +20,41 @@ public class ConfigTests {
     public void testDefaultSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
         Config config = Config.ofYaml(file);
-        ConfigOption<Boolean> enabled = config.register(ConfigOption.of("enabled", true));
-        ConfigOption<List<String>> list = config.register(ConfigOption.of("list", List.of("a", "b", "c")));
+        config.optionOf("enabled", true);
+        config.optionOf("list", List.of("a", "b", "c"));
         config.save();
 
         assertTrue(file.exists(), "Config file should exist after saving");
-        List<String> lines = Files.readAllLines(file.toPath());
-        assertEquals("enabled: true", lines.get(0));
-        assertEquals("", lines.get(1));
-        assertEquals("list: [a, b, c]", lines.get(2));
+        String string = Files.readString(file.toPath());
+        assertEquals("""
+                enabled: true
+                
+                list:
+                 - a
+                 - b
+                 - c
+                """, string);
     }
 
     @Test
     public void testSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
         Config config = Config.ofYaml(file);
-        ConfigOption<Boolean> enabled = config.register(ConfigOption.of("enabled", true));
-        ConfigOption<List<String>> list = config.register(ConfigOption.of("list", List.of("a", "b", "c")));
+        ConfigOption<Boolean> enabled = config.optionOf("enabled", true);
+        ConfigOption<List<String>> list = config.optionOf("list", List.of("a", "b", "c"));
         config.set(enabled, false);
-        config.set(list, List.of("x", "y", "z"));
+        config.set(list, List.of("d", "e", "f"));
         config.save();
 
-        List<String> lines = Files.readAllLines(file.toPath());
-        assertEquals("enabled: false", lines.get(0));
-        assertEquals("", lines.get(1));
-        assertEquals("list: [x, y, z]", lines.get(2));
+        String string = Files.readString(file.toPath());
+        assertEquals("""
+                enabled: false
+                
+                list:
+                 - d
+                 - e
+                 - f
+                """, string);
     }
 
     @Test
@@ -60,8 +70,8 @@ public class ConfigTests {
         ));
 
         Config config = Config.ofYaml(file);
-        ConfigOption<Boolean> enabled = config.register(ConfigOption.of("enabled", false));
-        ConfigOption<List<String>> list = config.register(ConfigOption.of("list", List.of("x", "y", "z")));
+        ConfigOption<Boolean> enabled = config.optionOf("enabled", false);
+        ConfigOption<List<String>> list = config.optionOf("list", List.of("x", "y", "z"));
         config.load();
 
         assertTrue(config.get(enabled), "Enabled should be true");
