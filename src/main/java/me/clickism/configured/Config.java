@@ -252,7 +252,6 @@ public class Config {
             data = format.read(file);
             if (hasOlderVersion()) {
                 Configured.LOGGER.info("Config file '" + file.getPath() + "' has a different version. Saving current version.");
-                set(VERSION_OPTION, version);
                 save();
             }
         } catch (Exception e) {
@@ -277,6 +276,8 @@ public class Config {
      * If the config file does not exist, it will be created.
      */
     public void save() {
+        // Set the version to the current version
+        set(VERSION_OPTION, version);
         // Save all options, even if they are not set
         List<Map.Entry<ConfigOption<?>, Object>> dataToSave = new ArrayList<>(options.size());
         for (ConfigOption<?> option : options) {
