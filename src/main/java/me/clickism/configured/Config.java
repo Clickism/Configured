@@ -6,7 +6,6 @@ import me.clickism.configured.format.YamlFormat;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -154,6 +153,21 @@ public class Config {
      */
     public static Config ofJson5(String filePath) {
         return ofJson5(new File(filePath));
+    }
+
+    /**
+     * Creates and registers a new option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @param <T>          the type of the option
+     * @return the registered option
+     */
+    public <T> ConfigOption<T> optionOf(String key, T defaultValue) {
+        return register(ConfigOption.of(key, defaultValue));
     }
 
     /**
