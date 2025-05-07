@@ -5,12 +5,13 @@ versioned and documented configuration files directly from code in multiple form
 ### How to Use
 You can specify a config and register its options like this:
 ```java
-public static final Config CONFIG = Config.ofYaml("config.yml")
-        .version(1)
-        .header("""
-                Example configuration file
-                Generated using Configured!
-                """);
+public static final Config CONFIG = 
+        Config.ofYaml("config.yml")
+            .version(1)
+            .header("""
+                    Example configuration file
+                    Generated using Configured!
+                    """);
 
 public static final ConfigOption<String> NAME = 
         CONFIG.optionOf("name", "John Smith")
