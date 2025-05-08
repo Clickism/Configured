@@ -276,7 +276,9 @@ public class Config {
      */
     public void save() {
         // Set the version to the current version
-        set(VERSION_OPTION, version);
+        if (options.contains(VERSION_OPTION)) {
+            set(VERSION_OPTION, version);
+        }
         // Save all options, even if they are not set
         List<Map.Entry<ConfigOption<?>, Object>> dataToSave = new ArrayList<>(options.size());
         for (ConfigOption<?> option : options) {
