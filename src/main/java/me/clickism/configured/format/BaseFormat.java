@@ -61,6 +61,13 @@ public abstract class BaseFormat extends ConfigFormat {
         Files.writeString(config.file().toPath(), string);
     }
 
+    /**
+     * Writes the data/config options to the StringBuilder.
+     *
+     * @param sb   the StringBuilder to write to
+     * @param data the data to write
+     * @throws Exception if an error occurs while writing
+     */
     protected void writeData(StringBuilder sb, List<Map.Entry<ConfigOption<?>, Object>> data) throws Exception {
         Iterator<Map.Entry<ConfigOption<?>, Object>> iterator = data.iterator();
         while (iterator.hasNext()) {
@@ -71,6 +78,15 @@ public abstract class BaseFormat extends ConfigFormat {
         }
     }
 
+    /**
+     * Writes a config option to the StringBuilder.
+     *
+     * @param sb      the StringBuilder to write to
+     * @param option  the config option to write
+     * @param value   the value of the config option
+     * @param hasNext true if there is a next entry, false otherwise
+     * @throws Exception if an error occurs while writing
+     */
     protected void writeConfigOption(StringBuilder sb, ConfigOption<?> option,
                                      Object value, boolean hasNext) throws Exception {
         writeHeader(sb, option.header());
@@ -82,16 +98,34 @@ public abstract class BaseFormat extends ConfigFormat {
         }
     }
 
+    /**
+     * Writes a description to the StringBuilder.
+     *
+     * @param sb          the StringBuilder to write to
+     * @param description the description to write
+     */
     protected void writeDescription(StringBuilder sb, @Nullable String description) {
         if (!writeComments || description == null) return;
         sb.append(formatComment(description)).append('\n');
     }
 
+    /**
+     * Writes a header to the StringBuilder.
+     *
+     * @param sb     the StringBuilder to write to
+     * @param header the header to write
+     */
     protected void writeHeader(StringBuilder sb, @Nullable String header) {
         if (!writeComments || header == null) return;
         sb.append(formatComment(header)).append("\n\n");
     }
 
+    /**
+     * Writes a footer to the StringBuilder.
+     *
+     * @param sb     the StringBuilder to write to
+     * @param footer the footer to write
+     */
     protected void writeFooter(StringBuilder sb, @Nullable String footer) {
         if (!writeComments || footer == null) return;
         sb.append('\n').append(formatComment(footer)).append('\n');

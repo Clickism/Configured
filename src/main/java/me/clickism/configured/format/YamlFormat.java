@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * YAML format for configuration files.
+ */
 public class YamlFormat extends BaseFormat {
     YAMLFactory yamlFactory = new YAMLFactory();
     YAMLMapper mapper = new YAMLMapper(yamlFactory)
