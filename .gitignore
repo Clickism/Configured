@@ -2,3 +2,9 @@
 build/
 .idea/
 .DS_Store
+
+# Config files
+*.yml
+*.json5
+*.json
+*.jsonc
