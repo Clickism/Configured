@@ -7,15 +7,9 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.core.util.Separators;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import me.clickism.configured.Config;
-import me.clickism.configured.ConfigOption;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,39 +28,6 @@ import java.util.Map;
  * </p>
  */
 public class JsonFormat extends BaseFormat {
-
-    /**
-     * Enum representing the supported JSON flavors.
-     */
-    public enum JsonType {
-        /**
-         * Standard JSON format.
-         */
-        JSON,
-
-        /**
-         * This format allows comments in the JSON file, but is otherwise standard JSON.
-         */
-        JSONC,
-
-        /**
-         * This format allows for more relaxed syntax rules, such as trailing commas and
-         * unquoted keys.
-         * <p>
-         * The implementation is based on the Jackson library and supports
-         * most of the JSON5 standard except for:
-         * </p>
-         * <ul>
-         *     <li>Multi-line strings</li>
-         *     <li>Hexadecimal numbers</li>
-         * </ul>
-         */
-        JSON5;
-
-        private boolean allowsComments() {
-            return this == JSONC || this == JSON5;
-        }
-    }
 
     private final JsonType type;
     private final JsonFactory jsonFactory = new JsonFactory();
@@ -151,6 +112,39 @@ public class JsonFormat extends BaseFormat {
                 jsonFactory.enable(JsonReadFeature.ALLOW_TRAILING_DECIMAL_POINT_FOR_NUMBERS.mappedFeature());
                 jsonFactory.enable(JsonReadFeature.ALLOW_LEADING_PLUS_SIGN_FOR_NUMBERS.mappedFeature());
             }
+        }
+    }
+
+    /**
+     * Enum representing the supported JSON flavors.
+     */
+    public enum JsonType {
+        /**
+         * Standard JSON format.
+         */
+        JSON,
+
+        /**
+         * This format allows comments in the JSON file, but is otherwise standard JSON.
+         */
+        JSONC,
+
+        /**
+         * This format allows for more relaxed syntax rules, such as trailing commas and
+         * unquoted keys.
+         * <p>
+         * The implementation is based on the Jackson library and supports
+         * most of the JSON5 standard except for:
+         * </p>
+         * <ul>
+         *     <li>Multi-line strings</li>
+         *     <li>Hexadecimal numbers</li>
+         * </ul>
+         */
+        JSON5;
+
+        private boolean allowsComments() {
+            return this == JSONC || this == JSON5;
         }
     }
 }

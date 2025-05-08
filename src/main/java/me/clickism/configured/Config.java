@@ -18,9 +18,8 @@ public class Config {
 
     private final ConfigFormat format;
     private final File file;
-    private @Nullable Integer version;
-
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
+    private @Nullable Integer version;
     private Map<String, Object> data = new HashMap<>();
 
     private @Nullable String header;

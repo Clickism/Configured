@@ -20,6 +20,8 @@ public abstract class ConfigOption<T> {
     private @Nullable String header;
     private @Nullable String footer;
 
+    // TODO: Auto-handle different collection types
+
     /**
      * Creates a new config option.
      *
@@ -43,6 +45,7 @@ public abstract class ConfigOption<T> {
         return new ConfigOption<>(key, defaultValue) {};
     }
 
+    // TODO: Move to format-specific logic?
     private static String formatDefaultValue(Object defaultValue) {
         if (defaultValue instanceof List<?> list) {
             return "[" +
