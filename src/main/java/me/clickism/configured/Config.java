@@ -17,8 +17,10 @@ public class Config {
     private static final ConfigOption<Integer> VERSION_OPTION = ConfigOption.of("_version", 0);
 
     private final ConfigFormat format;
-    private final File file;
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
+
+    private @Nullable File file;
+
     private @Nullable Integer version;
     private Map<String, Object> data = new HashMap<>();
 
@@ -31,7 +33,7 @@ public class Config {
      * @param format the format of the config file
      * @param file   the file to read/write the config from/to
      */
-    public Config(ConfigFormat format, File file) {
+    public Config(ConfigFormat format, @Nullable File file) {
         this.format = format;
         this.file = file;
     }
@@ -238,6 +240,10 @@ public class Config {
      * This will overwrite any unsaved changes in the config.
      */
     public void load() {
+        if (file == null) {
+            Configured.LOGGER.severe("No file specified for config!");
+            return;
+        }
         try {
             if (!file.exists()) {
                 // Set the version to the current version
@@ -275,6 +281,10 @@ public class Config {
      * If the config file does not exist, it will be created.
      */
     public void save() {
+        if (file == null) {
+            Configured.LOGGER.severe("No file specified for config!");
+            return;
+        }
         // Set the version to the current version
         if (options.contains(VERSION_OPTION)) {
             set(VERSION_OPTION, version);
@@ -283,6 +293,10 @@ public class Config {
         List<Map.Entry<ConfigOption<?>, Object>> dataToSave = new ArrayList<>(options.size());
         for (ConfigOption<?> option : options) {
             Object value = data.getOrDefault(option.key(), option.defaultValue());
+            if (option.isHidden() && Objects.equals(value, option.defaultValue())) {
+                // Don't save hidden options if they are not set
+                continue;
+            }
             dataToSave.add(Map.entry(option, value));
         }
         // Save the data to the file
@@ -306,8 +320,19 @@ public class Config {
      *
      * @return the file associated with this config
      */
-    public File file() {
+    public @Nullable File file() {
         return file;
+    }
+
+    /**
+     * Sets the file associated with this config.
+     *
+     * @param file the file to set
+     * @return this Config instance
+     */
+    public Config file(File file) {
+        this.file = file;
+        return this;
     }
 
     /**

@@ -3,6 +3,7 @@ package me.clickism.configured;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -15,8 +16,9 @@ import java.util.stream.Collectors;
 public abstract class ConfigOption<T> {
     private final String key;
     private final T defaultValue;
-    private @Nullable String description;
+    private boolean hidden = false;
 
+    private @Nullable String description;
     private @Nullable String header;
     private @Nullable String footer;
 
@@ -73,6 +75,29 @@ public abstract class ConfigOption<T> {
      */
     public T defaultValue() {
         return defaultValue;
+    }
+
+    /**
+     * Marks the config option as hidden.
+     * Hidden config options will be loaded, but their default values will not be
+     * written to the config file by default.
+     *
+     * @return this config option
+     */
+    public ConfigOption<T> hidden() {
+        this.hidden = true;
+        return this;
+    }
+
+    /**
+     * Checks if the config option is hidden.
+     * Hidden config options will be loaded, but their default values will not be
+     * written to the config file by default.
+     *
+     * @return true if the config option is hidden, false otherwise
+     */
+    public boolean isHidden() {
+        return hidden;
     }
 
     /**
