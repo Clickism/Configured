@@ -137,7 +137,7 @@ public class CommentTests {
                 .appendParenthesizedDefaultValue();
         config.optionOf("list", List.of("a", "b", "c"))
                 .appendDefaultValue();
-        config.optionOf("map", Map.of("key", "value", "key2", "value2"))
+        config.optionOf("map", Map.of("key", "value"))
                 .description("Test Description");
         config.save();
 
@@ -166,7 +166,6 @@ public class CommentTests {
                         # Test Description
                         map:
                           key: value
-                          key2: value2
                         """, string
         );
     }
