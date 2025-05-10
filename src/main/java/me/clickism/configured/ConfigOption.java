@@ -17,10 +17,8 @@ import java.util.stream.Collectors;
 public abstract class ConfigOption<T> {
     private final String key;
     private final T defaultValue;
-    private boolean hidden = false;
-
     private final List<Consumer<T>> onLoadListeners = new ArrayList<>();
-
+    private boolean hidden = false;
     private @Nullable String description;
     private @Nullable String header;
     private @Nullable String footer;
@@ -229,18 +227,6 @@ public abstract class ConfigOption<T> {
     public ConfigOption<T> footer(String footer) {
         this.footer = footer.trim();
         return this;
-    }
-
-    /**
-     * Casts the given value to the type of this config option.
-     *
-     * @param value the value to cast
-     * @return the cast value
-     * @throws ClassCastException if the value cannot be cast to the type of this config option
-     */
-    @SuppressWarnings("unchecked")
-    public T cast(Object value) throws ClassCastException {
-        return (T) value;
     }
 
     @Override
