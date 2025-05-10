@@ -2,6 +2,7 @@ package me.clickism.configured;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -17,6 +18,8 @@ public abstract class ConfigOption<T> {
     private final String key;
     private final T defaultValue;
     private boolean hidden = false;
+
+    private final List<Consumer<T>> onLoadListeners = new ArrayList<>();
 
     private @Nullable String description;
     private @Nullable String header;
@@ -98,6 +101,26 @@ public abstract class ConfigOption<T> {
      */
     public boolean isHidden() {
         return hidden;
+    }
+
+    /**
+     * Adds a listener that will be called when the config option is loaded.
+     *
+     * @param listener the listener to add
+     * @return this config option
+     */
+    public ConfigOption<T> onLoad(Consumer<T> listener) {
+        onLoadListeners.add(listener);
+        return this;
+    }
+
+    /**
+     * Gets the list of listeners that will be called when the config option is loaded.
+     *
+     * @return the list of listeners
+     */
+    public List<Consumer<T>> onLoadListeners() {
+        return onLoadListeners;
     }
 
     /**
@@ -206,6 +229,18 @@ public abstract class ConfigOption<T> {
     public ConfigOption<T> footer(String footer) {
         this.footer = footer.trim();
         return this;
+    }
+
+    /**
+     * Casts the given value to the type of this config option.
+     *
+     * @param value the value to cast
+     * @return the cast value
+     * @throws ClassCastException if the value cannot be cast to the type of this config option
+     */
+    @SuppressWarnings("unchecked")
+    public T cast(Object value) throws ClassCastException {
+        return (T) value;
     }
 
     @Override

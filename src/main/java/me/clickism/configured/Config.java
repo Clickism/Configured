@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 /**
@@ -255,12 +256,25 @@ public class Config {
                 return;
             }
             data = format.read(file);
+            callListeners();
             if (hasOlderVersion()) {
                 Configured.LOGGER.info("Config file '" + file.getPath() + "' has a different version. Saving current version.");
                 save();
             }
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
+        }
+    }
+
+    /**
+     * Calls the onLoad listeners for all registered options that are set.
+     */
+    @SuppressWarnings("unchecked")
+    private void callListeners() {
+        for (ConfigOption<?> option : options) {
+            if (!data.containsKey(option.key())) continue;
+            option.onLoadListeners().forEach(listener ->
+                    ((Consumer<Object>) listener).accept(get(option)));
         }
     }
 
