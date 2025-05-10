@@ -37,22 +37,4 @@ public class SaveLoadTests {
         Config config = Config.ofYaml(tempDir.resolve("config.yml").toFile());
         assertSaveAndLoad(config);
     }
-//
-//    @Test
-//    public void testSaveLoadJson(@TempDir Path tempDir) {
-//        Config config = Config.ofJson(tempDir.resolve("config.json").toFile());
-//        assertSaveAndLoad(config);
-//    }
-//
-//    @Test
-//    public void testSaveLoadJsonWithComments(@TempDir Path tempDir) {
-//        Config config = Config.ofJsonWithComments(tempDir.resolve("config.jsonc").toFile());
-//        assertSaveAndLoad(config);
-//    }
-//
-//    @Test
-//    public void testSaveLoadJson5(@TempDir Path tempDir) {
-//        Config config = Config.ofJson5(tempDir.resolve("config.json5").toFile());
-//        assertSaveAndLoad(config);
-//    }
 }
