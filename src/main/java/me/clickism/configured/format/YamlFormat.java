@@ -46,6 +46,7 @@ public class YamlFormat extends BaseFormat {
                                  Object value, boolean hasNext) throws Exception {
         String string = dump.dumpToString(value);
         sb.append(key).append(":");
+        // Handle indentation for collections and maps manually
         if (value instanceof Collection<?> collection) {
             if (collection.isEmpty()) {
                 sb.append(" []\n");
