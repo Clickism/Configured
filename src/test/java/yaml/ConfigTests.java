@@ -30,9 +30,9 @@ public class ConfigTests {
                 enabled: true
                 
                 list:
-                 - a
-                 - b
-                 - c
+                - a
+                - b
+                - c
                 """, string);
     }
 
@@ -51,9 +51,9 @@ public class ConfigTests {
                 enabled: false
                 
                 list:
-                 - d
-                 - e
-                 - f
+                - d
+                - e
+                - f
                 """, string);
     }
 

@@ -2,6 +2,7 @@ package me.clickism.configured.format;
 
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public abstract class ConfigFormat {
      * @return the data as a map
      * @throws IOException if an error occurs while reading the file
      */
-    public abstract Map<String, Object> read(File file) throws Exception;
+    public abstract @NotNull Map<String, Object> read(File file) throws Exception;
 
     /**
      * Writes the data to a configuration file.

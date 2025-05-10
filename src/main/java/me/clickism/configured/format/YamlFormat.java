@@ -1,28 +1,36 @@
 package me.clickism.configured.format;
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import org.jetbrains.annotations.NotNull;
+import org.snakeyaml.engine.v2.api.Dump;
+import org.snakeyaml.engine.v2.api.DumpSettings;
+import org.snakeyaml.engine.v2.api.Load;
+import org.snakeyaml.engine.v2.api.LoadSettings;
+import org.snakeyaml.engine.v2.common.FlowStyle;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * YAML format for configuration files.
  */
 public class YamlFormat extends BaseFormat {
-    YAMLFactory yamlFactory = new YAMLFactory();
-    YAMLMapper mapper = new YAMLMapper(yamlFactory)
-            .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-            .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
-            .enable(YAMLGenerator.Feature.INDENT_ARRAYS);
+
+    private final Load load = new Load(LoadSettings.builder().build());
+    private final Dump dump = new Dump(DumpSettings.builder()
+            .setMultiLineFlow(true)
+            .setDefaultFlowStyle(FlowStyle.BLOCK)
+            .build());
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> read(File file) throws Exception {
+    public @NotNull Map<String, Object> read(File file) throws Exception {
         try {
-            return (Map<String, Object>) mapper.readValue(file, Map.class);
+            Map<String, Object> map = (Map<String, Object>) load.loadFromString(Files.readString(file.toPath()));
+            return map != null ? map : new HashMap<>();
         } catch (Exception e) {
             throw new IOException("Failed to read config file: " + file.getPath(), e);
         }
@@ -36,7 +44,27 @@ public class YamlFormat extends BaseFormat {
     @Override
     protected void writeKeyValue(StringBuilder sb, String key,
                                  Object value, boolean hasNext) throws Exception {
-        String string = mapper.writeValueAsString(Map.of(key, value));
+        String string = dump.dumpToString(value);
+        sb.append(key).append(":");
+        if (value instanceof Collection<?> collection) {
+            if (collection.isEmpty()) {
+                sb.append(" []\n");
+                return;
+            }
+            sb.append("\n");
+        } else if (value instanceof Map<?, ?> map) {
+            if (map.isEmpty()) {
+                sb.append(" {}\n");
+                return;
+            }
+            sb.append("\n");
+            string = "  " + string.replaceAll("\n", "\n  ").stripTrailing();
+            sb.append(string);
+            sb.append("\n");
+            return;
+        } else {
+            sb.append(" ");
+        }
         sb.append(string);
     }
 

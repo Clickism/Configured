@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -136,6 +137,8 @@ public class CommentTests {
                 .appendParenthesizedDefaultValue();
         config.optionOf("list", List.of("a", "b", "c"))
                 .appendDefaultValue();
+        config.optionOf("map", Map.of("key", "value", "key2", "value2"))
+                .description("Test Description");
         config.save();
 
         String string = Files.readString(path);
@@ -156,9 +159,14 @@ public class CommentTests {
                         
                         # Default: [a, b, c]
                         list:
-                         - a
-                         - b
-                         - c
+                        - a
+                        - b
+                        - c
+                        
+                        # Test Description
+                        map:
+                          key: value
+                          key2: value2
                         """, string
         );
     }
