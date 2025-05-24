@@ -63,11 +63,15 @@ public class Localization {
         return version;
     }
 
-    public <T extends Enum<T> & LocalizationKey> Localization registerOptionsFor(Class<T> enumClass) {
+    public <T extends Enum<T> & LocalizationKey> Localization registerKeysFor(Class<T> enumClass) {
         for (Enum<T> enumConstant : enumClass.getEnumConstants()) {
-            LocalizationKey key = (LocalizationKey) enumConstant;
-            options.add(ConfigOption.of(key.key(), key.key()));
+            registerKey((LocalizationKey) enumConstant);
         }
+        return this;
+    }
+
+    public Localization registerKey(LocalizationKey key) {
+        options.add(ConfigOption.of(key.key(), key.key()));
         return this;
     }
 
@@ -107,7 +111,7 @@ public class Localization {
 
     public String get(LocalizationKey key, Object... params) {
         String result = getLocalizedString(key);
-        String[] paramNames = ParameterRegistry.getParameters(key);
+        String[] paramNames = key.parameters();
         for (int i = 0; i < Math.min(params.length, paramNames.length); i++) {
             Object param = params[i];
             String paramName = paramNames[i];
