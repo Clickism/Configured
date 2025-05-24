@@ -25,6 +25,8 @@ public class Localization {
     private Config config;
     private Config fallbackConfig;
 
+    private @Nullable Integer version;
+
     public Localization(ConfigFormat format, Function<String, File> fileGenerator) {
         this.format = format;
         this.fileGenerator = fileGenerator;
@@ -52,6 +54,15 @@ public class Localization {
         return language;
     }
 
+    public Localization version(int version) {
+        this.version = version;
+        return this;
+    }
+
+    public @Nullable Integer version() {
+        return version;
+    }
+
     public <T extends Enum<T> & LocalizationKey> Localization registerOptionsFor(Class<T> enumClass) {
         for (Enum<T> enumConstant : enumClass.getEnumConstants()) {
             LocalizationKey key = (LocalizationKey) enumConstant;
@@ -71,19 +82,27 @@ public class Localization {
      */
     public Localization load() {
         if (language != null) {
-            File file = fileGenerator.apply(language);
-            config = new Config(format, file);
-            config.registerAll(options);
-            config.load();
+            config = createLanguageConfig(language);
         } else {
             Configured.LOGGER.severe("No language code specified for localization");
         }
         if (fallbackLanguage != null && !fallbackLanguage.equals(language)) {
-            File fallbackFile = fileGenerator.apply(fallbackLanguage);
-            fallbackConfig = new Config(format, fallbackFile);
-            fallbackConfig.loadIfExists();
+            fallbackConfig = createLanguageConfig(fallbackLanguage);
+        }
+        config.load();
+        if (fallbackConfig != null) {
+            fallbackConfig.load();
         }
         return this;
+    }
+
+    private Config createLanguageConfig(String language) {
+        Config config = new Config(format, fileGenerator.apply(language));
+        if (version != null) {
+            config.version(version);
+        }
+        return config.separateConfigOptions(false)
+                .registerAll(options);
     }
 
     public String get(LocalizationKey key, Object... params) {
