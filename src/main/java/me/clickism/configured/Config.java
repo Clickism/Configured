@@ -13,6 +13,7 @@ import java.util.logging.Level;
  * Represents a configuration file.
  */
 public class Config {
+    // TODO: Config formats in separate classes
     // TODO: Maybe add a way to add warning to not change the version
     private static final ConfigOption<Integer> VERSION_OPTION = ConfigOption.of("_version", 0);
 
@@ -92,7 +93,20 @@ public class Config {
     }
 
     /**
-     * Gets the value of an option, or the default value if it is not set.
+     * Registers multiple options in the config.
+     *
+     * @param options the options to register
+     * @return this Config instance
+     */
+    public Config registerAll(Collection<ConfigOption<?>> options) {
+        for (ConfigOption<?> option : options) {
+            register(option);
+        }
+        return this;
+    }
+
+    /**
+     * Gets the value of an option, or the default value if it is not set or has an invalid type.
      *
      * @param option the option to get
      * @param <T>    the type of the option
@@ -109,6 +123,27 @@ public class Config {
         } catch (ClassCastException ignored) {
             Configured.LOGGER.warning("Invalid value type for option '" + option.key() + "'. Using default value instead");
             return option.defaultValue();
+        }
+    }
+
+    /**
+     * Gets the value of an option, or null if it is not set or has an invalid type.
+     *
+     * @param option the option to get
+     * @param <T>    the type of the option
+     * @return the value of the option, or null if it is not set or has an invalid type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> @Nullable T getOrNull(ConfigOption<T> option) {
+        Object value = data.get(option.key());
+        if (value == null) {
+            return null;
+        }
+        try {
+            return (T) value;
+        } catch (ClassCastException ignored) {
+            Configured.LOGGER.warning("Invalid value type for option '" + option.key() + "'.");
+            return null;
         }
     }
 
@@ -141,7 +176,7 @@ public class Config {
 
     /**
      * Loads or reloads the config file.
-     * This will overwrite any unsaved changes in the config.
+     * <p>This will overwrite any unsaved changes in the config.</p>
      */
     public void load() {
         if (file == null) {
@@ -167,6 +202,22 @@ public class Config {
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
         }
+    }
+
+    /**
+     * Loads or reloads the config file only if it exists.
+     * <p>This will not create a new config file if it does not exist.</p>
+     * <p>This will overwrite any unsaved changes in the config if the config file exists.</p>
+     */
+    public void loadIfExists() {
+        if (file == null) {
+            Configured.LOGGER.severe("No file specified for config!");
+            return;
+        }
+        if (!file.exists()) {
+            return;
+        }
+        load();
     }
 
     /**
