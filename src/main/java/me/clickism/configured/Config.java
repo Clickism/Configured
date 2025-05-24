@@ -154,15 +154,16 @@ public class Config {
      * @param value  the value to set, or null to use the default value
      * @param <T>    the type of the option
      */
-    public <T> void set(ConfigOption<T> option, @Nullable T value) {
+    public <T> Config set(ConfigOption<T> option, @Nullable T value) {
         if (!options.contains(option)) {
             throw new IllegalArgumentException("Option '" + option.key() + "' is not registered");
         }
         if (value == null) {
             data.remove(option.key());
-            return;
+            return this;
         }
         data.put(option.key(), value);
+        return this;
     }
 
     /**
@@ -178,10 +179,10 @@ public class Config {
      * Loads or reloads the config file.
      * <p>This will overwrite any unsaved changes in the config.</p>
      */
-    public void load() {
+    public Config load() {
         if (file == null) {
             Configured.LOGGER.severe("No file specified for config!");
-            return;
+            return this;
         }
         try {
             if (!file.exists()) {
@@ -191,7 +192,7 @@ public class Config {
                 }
                 save();
                 // Not necessary to load
-                return;
+                return this;
             }
             data = format.read(file);
             callListeners();
@@ -202,6 +203,7 @@ public class Config {
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
         }
+        return this;
     }
 
     /**
@@ -209,27 +211,29 @@ public class Config {
      * <p>This will not create a new config file if it does not exist.</p>
      * <p>This will overwrite any unsaved changes in the config if the config file exists.</p>
      */
-    public void loadIfExists() {
+    public Config loadIfExists() {
         if (file == null) {
             Configured.LOGGER.severe("No file specified for config!");
-            return;
+            return this;
         }
         if (!file.exists()) {
-            return;
+            return this;
         }
         load();
+        return this;
     }
 
     /**
      * Calls the onLoad listeners for all registered options that are set.
      */
     @SuppressWarnings("unchecked")
-    private void callListeners() {
+    private Config callListeners() {
         for (ConfigOption<?> option : options) {
             if (!data.containsKey(option.key())) continue;
             option.onLoadListeners().forEach(listener ->
                     ((Consumer<Object>) listener).accept(get(option)));
         }
+        return this;
     }
 
     /**
@@ -248,10 +252,10 @@ public class Config {
      * This will save all registered options, even if they are not set.
      * If the config file does not exist, it will be created.
      */
-    public void save() {
+    public Config save() {
         if (file == null) {
             Configured.LOGGER.severe("No file specified for config!");
-            return;
+            return this;
         }
         // Set the version to the current version
         if (options.contains(VERSION_OPTION)) {
@@ -281,6 +285,7 @@ public class Config {
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to save config file: " + file.getAbsolutePath(), e);
         }
+        return this;
     }
 
     /**
