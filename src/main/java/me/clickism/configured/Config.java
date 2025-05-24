@@ -153,6 +153,7 @@ public class Config {
      * @param option the option to set
      * @param value  the value to set, or null to use the default value
      * @param <T>    the type of the option
+     * @return this Config instance
      */
     public <T> Config set(ConfigOption<T> option, @Nullable T value) {
         if (!options.contains(option)) {
@@ -178,6 +179,8 @@ public class Config {
     /**
      * Loads or reloads the config file.
      * <p>This will overwrite any unsaved changes in the config.</p>
+     *
+     * @return this Config instance
      */
     public Config load() {
         if (file == null) {
@@ -210,6 +213,8 @@ public class Config {
      * Loads or reloads the config file only if it exists.
      * <p>This will not create a new config file if it does not exist.</p>
      * <p>This will overwrite any unsaved changes in the config if the config file exists.</p>
+     *
+     * @return this Config instance
      */
     public Config loadIfExists() {
         if (file == null) {
@@ -251,6 +256,8 @@ public class Config {
      * Saves the config file.
      * This will save all registered options, even if they are not set.
      * If the config file does not exist, it will be created.
+     *
+     * @return this Config instance
      */
     public Config save() {
         if (file == null) {
