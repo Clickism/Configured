@@ -6,10 +6,22 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Class used to access parameters defined with the {@link Parameters} annotation.
+ */
 public class ParameterRegistry {
     private static final Set<String> REGISTERED_CLASSES = new HashSet<>();
     private static final Map<LocalizationKey, String[]> PARAMETERS = new HashMap<>();
 
+    /**
+     * Gets the parameters associated with a given localization key.
+     *
+     * <p>This method will register/cache all fields annotated with the
+     * {@link Parameters} annotation in the parent class of the given key.</p>
+     *
+     * @param key the localization key for which to retrieve parameters
+     * @return an array of parameters associated with the key
+     */
     public static String[] getParameters(LocalizationKey key) {
         registerParametersForParentClass(key);
         return PARAMETERS.getOrDefault(key, new String[0]);
