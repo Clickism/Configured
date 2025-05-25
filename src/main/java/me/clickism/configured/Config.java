@@ -234,12 +234,11 @@ public class Config {
             return;
         }
         try {
-            if (!file.exists() && create) {
+            if (!file.exists()) {
                 // Set the version to the current version
-                if (options.contains(VERSION_OPTION)) {
-                    set(VERSION_OPTION, version);
+                if (create) {
+                    save();
                 }
-                save();
                 // Still need to call listeners
                 callListeners();
                 // Not necessary to load
