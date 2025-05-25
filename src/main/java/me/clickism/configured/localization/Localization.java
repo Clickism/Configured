@@ -205,6 +205,26 @@ public class Localization {
         if (fallbackLanguage != null && !fallbackLanguage.equals(language)) {
             fallbackConfig = createLanguageConfig(fallbackLanguage);
         }
+        deployOrGenerateLocalizationFile();
+        if (fallbackConfig != null) {
+            fallbackConfig.loadIfExistsWithoutUpdating();
+        }
+        return this;
+    }
+
+    private void deployOrGenerateLocalizationFile() {
+        if (!config.exists()) {
+            if (resourceProvider != null) {
+                Configured.LOGGER.info("No localization file found for '" + language + "'. Deploying from resource...");
+                // todo: write current version to file if version is set
+                deployLocalizationFile();
+                return;
+            } else {
+                Configured.LOGGER.warning("No localization file found for '" + language + "'. "
+                                          + "But no resource directory set! "
+                                          + "Generating an empty localization file instead.");
+            }
+        }
         if (updateWithNewKeys) {
             config.load();
         } else {
@@ -213,20 +233,21 @@ public class Localization {
         if (isVersionMismatch()) {
             if (resourceProvider != null) {
                 Configured.LOGGER.info("Version mismatch detected. Deploying from resource directory for '"
-                                       + language + "'");
-                String path = resourceProvider.pathGenerator.apply(language);
-                if (deploySingleResource(resourceProvider.clazz(), path, fileGenerator.apply(language).getPath())) {
-                    config.load();
-                }
+                                       + language + "'...");
+                deployLocalizationFile();
             } else {
                 Configured.LOGGER.warning("Version mismatch detected, but no resource directory set! "
                                           + "Please ensure the localization files are up to date");
             }
         }
-        if (fallbackConfig != null) {
-            fallbackConfig.loadIfExistsWithoutUpdating();
+    }
+
+    private void deployLocalizationFile() {
+        if (resourceProvider == null) return;
+        String path = resourceProvider.pathGenerator.apply(language);
+        if (deploySingleResource(resourceProvider.clazz(), path, fileGenerator.apply(language).getPath())) {
+            config.load();
         }
-        return this;
     }
 
     private Config createLanguageConfig(String language) {
