@@ -179,53 +179,81 @@ public class Config {
     /**
      * Loads or reloads the config file.
      * <p>This will overwrite any unsaved changes in the config.</p>
+     * <p>This WILL create the config file if it does not exist.</p>
+     * <p>This WILL update the config file if there is a version mismatch.</p>
      *
      * @return this Config instance
      */
     public Config load() {
+        loadInternal(true, true);
+        return this;
+    }
+
+    /**
+     * Loads the config file without creating it or updating it.
+     * <p>This will overwrite any unsaved changes in the config.</p>
+     * <p>This WILL create the config file if it does not exist.</p>
+     * <p>This will NOT update the config file if there is a version mismatch.</p>
+     *
+     * @return this Config instance
+     */
+    public Config loadWithoutUpdating() {
+        loadInternal(true, false);
+        return this;
+    }
+
+    /**
+     * Loads the config file if it exists, without creating it.
+     * <p>This will overwrite any unsaved changes in the config.</p>
+     * <p>This will NOT create the config file if it does not exist.</p>
+     * <p>This WILL update the config file if there is a version mismatch.</p>
+     *
+     * @return this Config instance
+     */
+    public Config loadIfExists() {
+        loadInternal(false, true);
+        return this;
+    }
+
+    /**
+     * Loads the config file if it exists, without updating it.
+     * <p>This will overwrite any unsaved changes in the config only if the config file exists.</p>
+     * <p>This will NOT create the config file if it does not exist.</p>
+     * <p>This will NOT update the config file if there is a version mismatch.</p>
+     *
+     * @return this Config instance
+     */
+    public Config loadIfExistsWithoutUpdating() {
+        loadInternal(false, false);
+        return this;
+    }
+
+    private void loadInternal(boolean create, boolean update) {
         if (file == null) {
             Configured.LOGGER.severe("No file specified for config!");
-            return this;
+            return;
         }
         try {
-            if (!file.exists()) {
+            if (!file.exists() && create) {
                 // Set the version to the current version
                 if (options.contains(VERSION_OPTION)) {
                     set(VERSION_OPTION, version);
                 }
                 save();
+                // Still need to call listeners
+                callListeners();
                 // Not necessary to load
-                return this;
+                return;
             }
             data = format.read(file);
-            callListeners();
-            if (isVersionMismatch()) {
+            if (isVersionMismatch() && update) {
                 Configured.LOGGER.info("Config file '" + file.getPath() + "' has a different version. Saving current version.");
                 save();
             }
+            callListeners();
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
         }
-        return this;
-    }
-
-    /**
-     * Loads or reloads the config file only if it exists.
-     * <p>This will not create a new config file if it does not exist.</p>
-     * <p>This will overwrite any unsaved changes in the config if the config file exists.</p>
-     *
-     * @return this Config instance
-     */
-    public Config loadIfExists() {
-        if (file == null) {
-            Configured.LOGGER.severe("No file specified for config!");
-            return this;
-        }
-        if (!file.exists()) {
-            return this;
-        }
-        load();
-        return this;
     }
 
     /**
@@ -322,6 +350,29 @@ public class Config {
             register(VERSION_OPTION);
         }
         return this;
+    }
+
+    /**
+     * Gets the registered version of the config file.+
+     * <p>
+     * This will return the version that was set using {@link #version(int)}.
+     *
+     * @return an optional containing the version if it is set, or an empty optional if not
+     */
+    public Optional<Integer> version() {
+        return Optional.ofNullable(version);
+    }
+
+    /**
+     * Gets the current version of the config file.
+     * <p>
+     * This will return the version that is currently set in the config file.
+     * If the config file does not have a version set, it will return an empty optional.
+     *
+     * @return an optional containing the current version if it is set, or an empty optional if not
+     */
+    public Optional<Integer> currentVersion() {
+        return Optional.ofNullable(getOrNull(VERSION_OPTION));
     }
 
     /**
