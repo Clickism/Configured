@@ -9,5 +9,5 @@ public class Configured {
     /**
      * Logger for the Configured library.
      */
-    public static final Logger LOGGER = Logger.getLogger(Configured.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(Configured.class.getSimpleName());
 }
