@@ -244,7 +244,7 @@ public class Localization {
      *
      * <p>
      * This method will replace placeholders in the localized string with the
-     * provided parameters in the exact order they were specified.
+     * provided parameters in the <strong>exact</strong> order they were specified.
      * <p>
      * Example:
      * <blockquote><pre>

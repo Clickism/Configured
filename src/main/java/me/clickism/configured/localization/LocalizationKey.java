@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 public interface LocalizationKey {
     /**
      * Creates a new LocalizationKey with the specified key.
+     * <p>
+     * If you want to use parameters, use {@link #of(String, String...)} instead.
      *
      * @param key the key for the localization
      * @return a new LocalizationKey instance
