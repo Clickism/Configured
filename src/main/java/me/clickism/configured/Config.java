@@ -199,7 +199,7 @@ public class Config {
             }
             data = format.read(file);
             callListeners();
-            if (hasOlderVersion()) {
+            if (isVersionMismatch()) {
                 Configured.LOGGER.info("Config file '" + file.getPath() + "' has a different version. Saving current version.");
                 save();
             }
@@ -239,17 +239,6 @@ public class Config {
                     ((Consumer<Object>) listener).accept(get(option)));
         }
         return this;
-    }
-
-    /**
-     * Check if the loaded config file has an older version than the current version.
-     *
-     * @return true if the loaded config file has an older version, false otherwise
-     */
-    private boolean hasOlderVersion() {
-        if (version == null) return false;
-        int fileVersion = get(VERSION_OPTION);
-        return fileVersion != version;
     }
 
     /**
@@ -333,6 +322,17 @@ public class Config {
             register(VERSION_OPTION);
         }
         return this;
+    }
+
+    /**
+     * Check if the loaded config file has an older version than the current version.
+     *
+     * @return true if the loaded config file has an older version, false otherwise
+     */
+    private boolean isVersionMismatch() {
+        if (version == null) return false;
+        int fileVersion = get(VERSION_OPTION);
+        return fileVersion != version;
     }
 
     /**
