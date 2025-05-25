@@ -22,12 +22,11 @@ import java.util.function.Function;
  * Localization class for managing localized messages.
  */
 public class Localization {
-    private String parameterFormat = "{%s}";
-
     private final Function<String, File> fileGenerator;
     private final ConfigFormat format;
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
 
+    private String parameterFormat = "{%s}";
     private @Nullable String fallbackLanguage;
     private @Nullable String language;
 
