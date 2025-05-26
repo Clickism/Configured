@@ -276,24 +276,45 @@ public class Config {
      * @return this Config instance
      */
     public Config save() {
+        saveInternal(true);
+        return this;
+    }
+
+    /**
+     * Saves all data read in the config file,
+     * including data that don't have a corresponding
+     * registered option.
+     * <p>
+     * Will write data in the order:
+     * <ol>
+     *     <li>Registered options</li>
+     *     <li>Unregistered data</li>
+     * </ol>
+     * <p>
+     * The ordering of the unregistered data will only
+     * be preserved if the {@link ConfigFormat} returns
+     * a {@link LinkedHashMap} or similar after reading
+     * the file. Make sure to use a format that
+     * preserves the order of the data if the ordering
+     * is important.
+     *
+     * @return this Config instance
+     */
+    public Config saveWithUnregisteredData() {
+        saveInternal(false);
+        return this;
+    }
+
+    private void saveInternal(boolean onlyRegistered) {
         if (file == null) {
             Configured.LOGGER.severe("No file specified for config!");
-            return this;
+            return;
         }
         // Set the version to the current version
         if (options.contains(VERSION_OPTION)) {
             set(VERSION_OPTION, version);
         }
-        // Save all options, even if they are not set
-        List<Map.Entry<ConfigOption<?>, Object>> dataToSave = new ArrayList<>(options.size());
-        for (ConfigOption<?> option : options) {
-            Object value = data.getOrDefault(option.key(), option.defaultValue());
-            if (option.isHidden() && Objects.equals(value, option.defaultValue())) {
-                // Don't save hidden options if they are not set
-                continue;
-            }
-            dataToSave.add(Map.entry(option, value));
-        }
+        var dataToSave = getDataToSave(onlyRegistered);
         // Save the data to the file
         try {
             File parentFile = file.getParentFile();
@@ -308,7 +329,29 @@ public class Config {
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to save config file: " + file.getAbsolutePath(), e);
         }
-        return this;
+    }
+
+    private List<Map.Entry<ConfigOption<?>, Object>> getDataToSave(boolean onlyRegistered) {
+        int size = onlyRegistered ? options.size() : data.size();
+        List<Map.Entry<ConfigOption<?>, Object>> dataToSave = new ArrayList<>(size);
+        // Save all options, even if they are not set
+        for (ConfigOption<?> option : options) {
+            Object value = data.getOrDefault(option.key(), option.defaultValue());
+            if (option.isHidden() && Objects.equals(value, option.defaultValue())) {
+                // Don't save hidden options if they are not set
+                continue;
+            }
+            dataToSave.add(Map.entry(option, value));
+        }
+        if (onlyRegistered) return dataToSave;
+        // Save all data, even if they are not registered
+        // Will keep order iff the data is a LinkedHashMap or similar.
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            ConfigOption<Object> option = ConfigOption.of(entry.getKey(), entry.getValue());
+            if (options.contains(option)) continue; // Skip registered options
+            dataToSave.add(Map.entry(option, entry.getValue()));
+        }
+        return dataToSave;
     }
 
     /**
@@ -329,6 +372,15 @@ public class Config {
     public Config file(File file) {
         this.file = file;
         return this;
+    }
+
+    /**
+     * Checks if the config file exists.
+     *
+     * @return true if the config file exists, false otherwise
+     */
+    public boolean exists() {
+        return file != null && file.exists();
     }
 
     /**
