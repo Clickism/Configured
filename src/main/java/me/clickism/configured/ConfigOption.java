@@ -233,4 +233,9 @@ public abstract class ConfigOption<T> {
     public int hashCode() {
         return key.hashCode();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ConfigOption<?> other && this.key.equals(other.key);
+    }
 }
