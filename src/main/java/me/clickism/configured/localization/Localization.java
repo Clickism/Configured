@@ -398,7 +398,7 @@ public class Localization {
      * @return true if the resource was successfully deployed, false otherwise
      */
     protected boolean deploySingleResource(Class<?> clazz, String resourcePath, String destinationPath) {
-        Configured.LOGGER.info("Deploying resource '" + resourcePath + "' to '" + destinationPath + "'");
+        Configured.LOGGER.info("Deploying resource '" + resourcePath + "' to '" + destinationPath + "'...");
         try (InputStream in = clazz.getResourceAsStream(resourcePath)) {
             if (in == null) throw new FileNotFoundException("Resource not found: " + resourcePath
                                                             + ". Local file will be used instead.");
