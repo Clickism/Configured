@@ -5,6 +5,7 @@ import me.clickism.configured.ConfigOption;
 import me.clickism.configured.Configured;
 import me.clickism.configured.format.ConfigFormat;
 import me.clickism.configured.format.YamlFormat;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 // TODO: Describe more about the localization system
+
 /**
  * Localization class for managing localized messages.
  */
@@ -128,6 +130,7 @@ public class Localization {
 
     private boolean isVersionMismatch() {
         if (version == null) return false;
+        if (config == null) return false; // No config loaded
         return config.currentVersion()
                 .map(version -> !version.equals(this.version))
                 .orElse(true); // Mismatch if no version set in the config
@@ -192,37 +195,41 @@ public class Localization {
 
     /**
      * Loads the localization files (config) based on the configured language and fallback language.
-     * <p>If the config file for the current language does not exist, it will be generated.</p>
-     * <p>If the config file for the fallback language does not exist, it will NOT be generated.</p>
-     *
-     * <p>This method will not load/generate anything if no language is set.</p>
+     * <p>
+     * If the config file for the current language or the fallback language
+     * does not exist, it will be deployed/generated.
+     * <p>
+     * This method will try to load the fallback language if no language is set.
+     * <p>
+     * If no language or fallback language is set, this method will not do
+     * anything.
      *
      * @return this Localization instance.
      */
     public Localization load() {
-        if (language != null) {
-            config = createLanguageConfig(language);
-        } else {
-            Configured.LOGGER.severe("No language code specified for localization");
+        if (language == null) {
+            if (fallbackLanguage == null) {
+                Configured.LOGGER.warning("No language or fallback language set for localization!");
+                return this;
+            }
+            Configured.LOGGER.warning("No language code specified for localization, using fallback language...");
+            language = fallbackLanguage;
         }
+        config = createLanguageConfig(language);
+        deployOrGenerateLocalizationFile(config, language);
         if (fallbackLanguage != null && !fallbackLanguage.equals(language)) {
             fallbackConfig = createLanguageConfig(fallbackLanguage);
-        }
-        deployOrGenerateLocalizationFile();
-        if (fallbackConfig != null) {
-            fallbackConfig.loadIfExistsWithoutUpdating();
+            deployOrGenerateLocalizationFile(fallbackConfig, fallbackLanguage);
         }
         return this;
     }
 
-    private void deployOrGenerateLocalizationFile() {
-        // No language set, nothing to do
-        if (language == null) return;
+    private void deployOrGenerateLocalizationFile(@NotNull Config config, @NotNull String language) {
         if (!config.exists()) {
             if (resourceProvider != null) {
                 Configured.LOGGER.info("No localization file found for '" + language + "'. Deploying from resource...");
                 // todo: write current version to file if version is set
-                deployLocalizationFile();
+                deployLocalizationFile(config, language);
                 return;
             } else {
                 Configured.LOGGER.warning("No localization file found for '" + language + "'. "
@@ -239,7 +246,7 @@ public class Localization {
             if (resourceProvider != null) {
                 Configured.LOGGER.info("Version mismatch detected. Deploying from resource directory for '"
                                        + language + "'...");
-                deployLocalizationFile();
+                deployLocalizationFile(config, language);
             } else {
                 Configured.LOGGER.warning("Version mismatch detected, but no resource directory set! "
                                           + "Please ensure the localization files are up to date");
@@ -247,7 +254,7 @@ public class Localization {
         }
     }
 
-    private void deployLocalizationFile() {
+    private void deployLocalizationFile(@NotNull Config config, @NotNull String language) {
         if (resourceProvider == null) return;
         String path = resourceProvider.pathGenerator.apply(language);
         if (deploySingleResource(resourceProvider.clazz(), path, fileGenerator.apply(language).getPath())) {
@@ -403,7 +410,10 @@ public class Localization {
             if (in == null) throw new FileNotFoundException("Resource not found: " + resourcePath
                                                             + ". Local file will be used instead.");
             File destinationFile = new File(destinationPath);
-            Files.createDirectories(destinationFile.getParentFile().toPath());
+            File destinationDirectory = destinationFile.getParentFile();
+            if (destinationDirectory != null) {
+                Files.createDirectories(destinationDirectory.toPath());
+            }
             Files.copy(in, destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
