@@ -130,7 +130,7 @@ public class Localization {
         if (version == null) return false;
         return config.currentVersion()
                 .map(version -> !version.equals(this.version))
-                .orElse(false);
+                .orElse(true); // Mismatch if no version set in the config
     }
 
     /**
@@ -171,13 +171,16 @@ public class Localization {
     /**
      * Sets whether to update the localization files with new keys.
      * <p>
-     * <strong>WARNING:</strong> If you set this to true, make sure to register all localization keys via
-     * {@link Localization#registerKeysFor(Class)} for enums or {@link Localization#registerKey(LocalizationKey)}
-     * for individual keys.
+     * <strong>WARNING:</strong> If you set this to true, make sure to register
+     * all localization keys via {@link Localization#registerKeysFor(Class)} for
+     * enums or {@link Localization#registerKey(LocalizationKey)} for individual
+     * keys. Otherwise, this is DESTRUCTIVE and will remove data unregistered for
+     * unregistered keys.
      * <p>
-     * This will only affect local files that are not deployed from the resource directory.
-     * If the localization files are not local and can be deployed from the resource directory,
-     * they will always be updated with new keys regardless of this setting.
+     * This will only affect local files that are not deployed from the resource
+     * directory. If the localization files are not local and can be deployed from
+     * the resource directory, they will always be updated with new keys regardless
+     * of this setting.
      *
      * @param updateWithNewKeys whether to update the localization files with new keys
      * @return this Localization instance
@@ -213,6 +216,8 @@ public class Localization {
     }
 
     private void deployOrGenerateLocalizationFile() {
+        // No language set, nothing to do
+        if (language == null) return;
         if (!config.exists()) {
             if (resourceProvider != null) {
                 Configured.LOGGER.info("No localization file found for '" + language + "'. Deploying from resource...");
@@ -246,6 +251,14 @@ public class Localization {
         if (resourceProvider == null) return;
         String path = resourceProvider.pathGenerator.apply(language);
         if (deploySingleResource(resourceProvider.clazz(), path, fileGenerator.apply(language).getPath())) {
+            config.loadWithoutUpdating();
+            if (version != null && config.currentVersion().isEmpty()) {
+                // If the deployed file does not have a version, set it to the current version
+                config.version(version);
+                // Save the config with the new version and preserve unregistered data
+                config.saveWithUnregisteredData();
+            }
+        } else {
             config.load();
         }
     }
