@@ -13,6 +13,8 @@ public class ParameterRegistry {
     private static final Set<String> REGISTERED_CLASSES = new HashSet<>();
     private static final Map<LocalizationKey, String[]> PARAMETERS = new HashMap<>();
 
+    private ParameterRegistry() {}
+
     /**
      * Gets the parameters associated with a given localization key.
      *
