@@ -53,6 +53,14 @@ public class Config {
         return new Config(file, format);
     }
 
+    /**
+     * Creates a new Config instance with the specified file path.
+     * The format will be determined based on the file extension.
+     *
+     * @param filePath the path to the config file
+     * @return a new Config instance
+     * @throws IllegalArgumentException if no format is found for the file extension
+     */
     public static Config of(@NotNull String filePath) {
         return of(new File(filePath));
     }
@@ -116,6 +124,7 @@ public class Config {
      *
      * @param key          the key of the option
      * @param defaultValue the default value of the option
+     * @param <T>          the type of the option
      * @return the registered option
      */
     public <T extends Number> ConfigOption<T> optionOf(String key, T defaultValue) {
@@ -154,11 +163,14 @@ public class Config {
      * Creates and registers a new list option in the config with the given key and default value.
      * <p>
      * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
-     * </p>
+     * <p>
+     * <strong>WARNING:</strong> Only the elements of the list will be cast to the specified type.
+     * Objects won't recursively be cast to the specified type.
      *
      * @param key          the key of the option
      * @param defaultValue the default value of the option
      * @param elementType  the type of the elements in the list
+     * @param <T>          the type of the elements in the list
      * @return the registered option
      */
     public <T> ConfigOption<List<T>> optionOf(String key, List<T> defaultValue,
@@ -170,11 +182,14 @@ public class Config {
      * Creates and registers a new set option in the config with the given key and default value.
      * <p>
      * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
-     * </p>
+     * <p>
+     * <strong>WARNING:</strong> Only the elements of the set will be cast to the specified type.
+     * Objects won't recursively be cast to the specified element type.
      *
      * @param key          the key of the option
      * @param defaultValue the default value of the option
      * @param elementType  the type of the elements in the set
+     * @param <T>          the type of the elements in the set
      * @return the registered option
      */
     public <T> ConfigOption<Set<T>> optionOf(String key, Set<T> defaultValue,
@@ -186,12 +201,16 @@ public class Config {
      * Creates and registers a new map option in the config with the given key and default value.
      * <p>
      * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
-     * </p>
+     * <p>
+     * <strong>WARNING:</strong> Only the keys and values of the map will be cast to the specified types.
+     * Objects won't recursively be cast to the specified key and value types.
      *
      * @param key          the key of the option
      * @param defaultValue the default value of the option
      * @param keyType      the type of the keys in the map
      * @param valueType    the type of the values in the map
+     * @param <K>          the type of the keys in the map
+     * @param <V>          the type of the values in the map
      * @return the registered option
      */
     public <K, V> ConfigOption<Map<K, V>> optionOf(String key, Map<K, V> defaultValue,

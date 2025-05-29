@@ -112,9 +112,14 @@ public class ConfigOption<T> {
 
     /**
      * Creates a new config option with the given key and default value.
+     * <p>
+     * <strong>WARNING:</strong> Only the elements of the list will be cast to the specified type.
+     * Objects won't recursively be cast to the specified element type.
      *
      * @param key          the key of the config option
      * @param defaultValue the default value of the config option
+     * @param elementType  the type of the elements in the list
+     * @param <T>          the type of the elements in the list
      * @return the new config option
      */
     public static <T> ConfigOption<List<T>> of(String key, List<T> defaultValue,
@@ -134,9 +139,14 @@ public class ConfigOption<T> {
 
     /**
      * Creates a new config option with the given key and default value.
+     * <p>
+     * <strong>WARNING:</strong> Only the elements of the set will be cast to the specified type.
+     * Objects won't recursively be cast to the specified element type.
      *
      * @param key          the key of the config option
      * @param defaultValue the default value of the config option
+     * @param elementType  the type of the elements in the set
+     * @param <T>          the type of the elements in the set
      * @return the new config option
      */
     public static <T> ConfigOption<Set<T>> of(String key, Set<T> defaultValue,
@@ -156,9 +166,16 @@ public class ConfigOption<T> {
 
     /**
      * Creates a new config option with the given key and default value.
+     * <p>
+     * <strong>WARNING:</strong> Only the keys and values of the map will be cast to the specified types.
+     * Objects won't recursively be cast to the specified key and value types.
      *
      * @param key          the key of the config option
      * @param defaultValue the default value of the config option
+     * @param keyType      the type of the keys in the map
+     * @param valueType    the type of the values in the map
+     * @param <K>          the type of the keys in the map
+     * @param <V>          the type of the values in the map
      * @return the new config option
      */
     public static <K, V> ConfigOption<Map<K, V>> of(String key, Map<K, V> defaultValue,
@@ -192,6 +209,17 @@ public class ConfigOption<T> {
         return String.valueOf(defaultValue);
     }
 
+    /**
+     * Casts the given object to the specified type.
+     * <p>
+     * This method handles primitive types, collections, maps, and numbers.
+     *
+     * @param object the object to cast
+     * @param type   the type to cast to
+     * @param <T>    the type of the config option
+     * @return the cast object
+     * @throws ClassCastException if the object cannot be cast to the specified type
+     */
     @SuppressWarnings("unchecked")
     protected static <T> T cast(Object object, Class<T> type) throws ClassCastException {
         if (object == null) return null;
