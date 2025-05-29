@@ -6,7 +6,7 @@ versioned and documented configuration files directly from code in multiple form
 You can specify a `.yml` config and register its options like this:
 ```java
 public static final Config CONFIG = 
-        Config.of("config.yml")
+        Config.of("config.yml") // Data format inferred from the file extension
                 .version(1)
                 .header("""
                         Example configuration file
