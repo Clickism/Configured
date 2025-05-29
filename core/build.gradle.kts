@@ -21,6 +21,8 @@ dependencies {
     // Testing
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(project(":yaml"))
+    testImplementation(project(":json"))
     testFixturesImplementation(platform("org.junit:junit-bom:5.10.0"))
     testFixturesImplementation("org.junit.jupiter:junit-jupiter")
 }
