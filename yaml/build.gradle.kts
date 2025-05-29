@@ -45,7 +45,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "configured-json"
+            artifactId = "configured-yaml"
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
         }
