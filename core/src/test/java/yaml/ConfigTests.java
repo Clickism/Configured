@@ -2,6 +2,7 @@ package yaml;
 
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
+import me.clickism.configured.YamlConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -19,7 +20,7 @@ public class ConfigTests {
     @Test
     public void testDefaultSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
-        Config config = Config.ofYaml(file);
+        Config config = YamlConfig.of(file);
         config.optionOf("enabled", true);
         config.optionOf("list", List.of("a", "b", "c"));
         config.save();
@@ -39,7 +40,7 @@ public class ConfigTests {
     @Test
     public void testSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
-        Config config = Config.ofYaml(file);
+        Config config = YamlConfig.of(file);
         ConfigOption<Boolean> enabled = config.optionOf("enabled", true);
         ConfigOption<List<String>> list = config.optionOf("list", List.of("a", "b", "c"));
         config.set(enabled, false);
@@ -69,7 +70,7 @@ public class ConfigTests {
                 "  - c"
         ));
 
-        Config config = Config.ofYaml(file);
+        Config config = YamlConfig.of(file);
         ConfigOption<Boolean> enabled = config.optionOf("enabled", false);
         ConfigOption<List<String>> list = config.optionOf("list", List.of("x", "y", "z"));
         config.load();

@@ -1,5 +1,6 @@
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
+import me.clickism.configured.YamlConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -34,7 +35,7 @@ public class SaveLoadTests {
 
     @Test
     public void testSaveLoadYaml(@TempDir Path tempDir) {
-        Config config = Config.ofYaml(tempDir.resolve("config.yml").toFile());
+        Config config = YamlConfig.of(tempDir.resolve("config.yml").toFile());
         assertSaveAndLoad(config);
     }
 }

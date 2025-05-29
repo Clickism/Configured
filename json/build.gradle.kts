@@ -11,20 +11,16 @@ repositories {
 }
 
 dependencies {
+    // Core
+    implementation(project(":core"))
+    // Json
+    implementation("com.google.code.gson:gson:2.13.1")
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.0")
-    // Testing
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation(project(":yaml"))
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
 
 tasks.register<Jar>("sourcesJar") {
@@ -41,7 +37,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "configured"
+            artifactId = "configured-json"
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
         }

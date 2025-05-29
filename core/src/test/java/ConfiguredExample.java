@@ -1,9 +1,10 @@
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
+import me.clickism.configured.YamlConfig;
 
 public class ConfiguredExample {
     public static final Config CONFIG =
-            Config.ofYaml("config.yml")
+            YamlConfig.of("config.yml")
                     .version(1)
                     .header("""
                             Example configuration file

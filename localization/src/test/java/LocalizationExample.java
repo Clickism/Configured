@@ -1,4 +1,6 @@
 import me.clickism.configured.Configured;
+import me.clickism.configured.format.JsonFormat;
+import me.clickism.configured.format.YamlFormat;
 import me.clickism.configured.localization.Localization;
 import me.clickism.configured.localization.LocalizationKey;
 import me.clickism.configured.localization.Parameters;
@@ -17,8 +19,8 @@ enum Message implements LocalizationKey {
 public class LocalizationExample {
 
     public static final Localization LOCALIZATION =
-            Localization.ofYaml(lang -> lang + ".yml")
-                    .resourceProvider(Configured.class, lang -> "/" + lang + ".yml")
+            Localization.of(JsonFormat.json(), lang -> lang + ".json")
+                    .resourceProvider(Configured.class, lang -> "/" + lang + ".json")
                     .version(2)
                     .fallbackLanguage("en_US")
                     .language("en_US");
