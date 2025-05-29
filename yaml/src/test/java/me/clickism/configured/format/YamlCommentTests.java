@@ -1,7 +1,6 @@
-package yaml;
+package me.clickism.configured.format;
 
 import me.clickism.configured.Config;
-import me.clickism.configured.ConfigOption;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -13,11 +12,11 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CommentTests {
+public class YamlCommentTests {
     @Test
     public void testHeader(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = Config.ofYaml(path.toFile());
+        Config config = Config.of(path.toFile());
         config.header("""
                 HEADER
                 ------
@@ -37,7 +36,7 @@ public class CommentTests {
     @Test
     public void testFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = Config.ofYaml(path.toFile());
+        Config config = Config.of(path.toFile());
         config.footer("""
                 FOOTER
                 ------
@@ -57,7 +56,7 @@ public class CommentTests {
     @Test
     public void testHeaderAndFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = Config.ofYaml(path.toFile());
+        Config config = Config.of(path.toFile());
         config.header("""
                 HEADER
                 ------
@@ -69,7 +68,8 @@ public class CommentTests {
                 This is a footer comment
                 """);
         config.optionOf("test", 5)
-                .description("Test value\nDefault: 5");
+                .description("Test value")
+                .appendDefaultValue();
         config.save();
 
         String string = Files.readString(path);
@@ -91,13 +91,13 @@ public class CommentTests {
     @Test
     public void testOptionHeaderAndFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = Config.ofYaml(path.toFile());
+        Config config = Config.of(path.toFile());
         config.optionOf("name", "Hello")
                 .description("Name of the player");
-        config.register(ConfigOption.of("test", 5)
+        config.optionOf("test", 5)
                 .header("Test header")
                 .description("Test value\nDefault: 5")
-                .footer("Test footer"));
+                .footer("Test footer");
         config.optionOf("enabled", true);
         config.save();
 
@@ -121,7 +121,7 @@ public class CommentTests {
     @Test
     public void testAppendDefaultValue(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = Config.ofYaml(path.toFile());
+        Config config = Config.of(path.toFile());
         config.optionOf("test", 5)
                 .description("Test value")
                 .appendDefaultValue();
@@ -135,9 +135,9 @@ public class CommentTests {
         config.optionOf("pi", 3.14)
                 .description("Pi constant")
                 .appendParenthesizedDefaultValue();
-        config.optionOf("list", List.of("a", "b", "c"))
+        config.optionOf("list", List.of("a", "b", "c"), String.class)
                 .appendDefaultValue();
-        config.optionOf("map", Map.of("key", "value"))
+        config.optionOf("map", Map.of("key", "value"), String.class, String.class)
                 .description("Test Description");
         config.save();
 

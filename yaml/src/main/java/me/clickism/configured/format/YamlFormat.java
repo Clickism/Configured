@@ -10,6 +10,7 @@ import org.snakeyaml.engine.v2.common.FlowStyle;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,20 @@ public class YamlFormat extends BaseFormat {
             .setMultiLineFlow(true)
             .setDefaultFlowStyle(FlowStyle.BLOCK)
             .build());
+
+    /**
+     * Creates a new YamlFormat instance.
+     */
+    protected YamlFormat() {}
+
+    /**
+     * Creates a new YamlFormat instance.
+     *
+     * @return a new instance of YamlFormat.
+     */
+    public static YamlFormat yaml() {
+        return new YamlFormat();
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -43,8 +58,8 @@ public class YamlFormat extends BaseFormat {
 
     @Override
     protected void writeKeyValue(StringBuilder sb, String key,
-                                 Object value, boolean hasNext) throws Exception {
-        String string = dump.dumpToString(value);
+                                 Object value, boolean hasNext) {
+        String string = dumpToString(value);
         sb.append(key).append(":");
         // Handle indentation for collections and maps manually
         if (value instanceof Collection<?> collection) {
@@ -67,6 +82,14 @@ public class YamlFormat extends BaseFormat {
             sb.append(" ");
         }
         sb.append(string);
+    }
+
+    private String dumpToString(Object value) {
+        if (value instanceof Collection<?> collection) {
+            // Avoid type casting issues with collections
+            return dump.dumpToString(new ArrayList<>(collection));
+        }
+        return dump.dumpToString(value);
     }
 
     @Override

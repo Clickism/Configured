@@ -17,7 +17,7 @@ enum Message implements LocalizationKey {
 public class LocalizationExample {
 
     public static final Localization LOCALIZATION =
-            Localization.ofYaml(lang -> lang + ".yml")
+            Localization.of(lang -> lang + ".yml")
                     .resourceProvider(Configured.class, lang -> "/" + lang + ".yml")
                     .version(2)
                     .fallbackLanguage("en_US")

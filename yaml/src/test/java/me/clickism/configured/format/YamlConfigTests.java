@@ -1,4 +1,4 @@
-package yaml;
+package me.clickism.configured.format;
 
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
@@ -14,14 +14,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ConfigTests {
+public class YamlConfigTests {
 
     @Test
     public void testDefaultSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
-        Config config = Config.ofYaml(file);
+        Config config = Config.of(file);
         config.optionOf("enabled", true);
-        config.optionOf("list", List.of("a", "b", "c"));
+        config.optionOf("list", List.of("a", "b", "c"), String.class);
         config.save();
 
         assertTrue(file.exists(), "Config file should exist after saving");
@@ -39,9 +39,9 @@ public class ConfigTests {
     @Test
     public void testSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
-        Config config = Config.ofYaml(file);
+        Config config = Config.of(file);
         ConfigOption<Boolean> enabled = config.optionOf("enabled", true);
-        ConfigOption<List<String>> list = config.optionOf("list", List.of("a", "b", "c"));
+        ConfigOption<List<String>> list = config.optionOf("list", List.of("a", "b", "c"), String.class);
         config.set(enabled, false);
         config.set(list, List.of("d", "e", "f"));
         config.save();
@@ -69,9 +69,9 @@ public class ConfigTests {
                 "  - c"
         ));
 
-        Config config = Config.ofYaml(file);
+        Config config = Config.of(file);
         ConfigOption<Boolean> enabled = config.optionOf("enabled", false);
-        ConfigOption<List<String>> list = config.optionOf("list", List.of("x", "y", "z"));
+        ConfigOption<List<String>> list = config.optionOf("list", List.of("x", "y", "z"), String.class);
         config.load();
 
         assertTrue(config.get(enabled), "Enabled should be true");

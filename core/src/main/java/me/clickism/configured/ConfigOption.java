@@ -2,8 +2,7 @@ package me.clickism.configured;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> the type of the config option
  */
-public abstract class ConfigOption<T> {
+public class ConfigOption<T> {
     private final String key;
     private final T defaultValue;
     private final List<Consumer<T>> onLoadListeners = new ArrayList<>();
@@ -38,26 +37,227 @@ public abstract class ConfigOption<T> {
 
     /**
      * Creates a new config option with the given key and default value.
+     * <p>
+     * <strong>WARNING</strong>: This method will only work if the config format supports
+     * objects of the given type. It is not guaranteed to work for all
+     * object types. Try to use the specific methods for primitive types
+     * and collections instead.
      *
      * @param key          the key of the config option
      * @param defaultValue the default value of the config option
      * @param <T>          the type of the config option
      * @return the new config option
      */
-    public static <T> ConfigOption<T> of(String key, T defaultValue) {
-        return new ConfigOption<>(key, defaultValue) {};
+    public static <T> ConfigOption<T> ofObject(String key, T defaultValue) {
+        return new ConfigOption<>(key, defaultValue);
+    }
+
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @return the new config option
+     */
+    public static ConfigOption<Boolean> of(String key, boolean defaultValue) {
+        return ofObject(key, defaultValue);
+    }
+
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @param <T>          the type of the number
+     * @return the new config option
+     */
+    public static <T extends Number> ConfigOption<T> of(String key, T defaultValue) {
+        return ofObject(key, defaultValue);
+    }
+
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @return the new config option
+     */
+    public static ConfigOption<String> of(String key, String defaultValue) {
+        return ofObject(key, defaultValue);
+    }
+
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @return the new config option
+     */
+    public static ConfigOption<Character> of(String key, char defaultValue) {
+        return new ConfigOption<>(key, defaultValue) {
+            @Override
+            public Character cast(Object object) throws ClassCastException {
+                if (object instanceof Character character) {
+                    return character;
+                } else if (object instanceof String string) {
+                    if (string.length() != 1) {
+                        throw new ClassCastException("String must be a single character: " + string);
+                    }
+                    return string.charAt(0);
+                }
+                throw new ClassCastException("Cannot cast into character: " + object.getClass().getName());
+            }
+        };
+    }
+
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @return the new config option
+     */
+    public static <T> ConfigOption<List<T>> of(String key, List<T> defaultValue,
+                                               Class<T> elementType) {
+        return new ConfigOption<>(key, defaultValue) {
+            @Override
+            public List<T> cast(Object object) throws ClassCastException {
+                if (object instanceof Collection<?> collection) {
+                    return collection.stream()
+                            .map(element -> cast(element, elementType))
+                            .collect(Collectors.toCollection(ArrayList::new));
+                }
+                throw new ClassCastException("Cannot cast into list: " + object.getClass().getName());
+            }
+        };
+    }
+
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @return the new config option
+     */
+    public static <T> ConfigOption<Set<T>> of(String key, Set<T> defaultValue,
+                                              Class<T> elementType) {
+        return new ConfigOption<>(key, defaultValue) {
+            @Override
+            public Set<T> cast(Object object) throws ClassCastException {
+                if (object instanceof Collection<?> collection) {
+                    return collection.stream()
+                            .map(element -> cast(element, elementType))
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
+                }
+                throw new ClassCastException("Cannot cast into set: " + object.getClass().getName());
+            }
+        };
+    }
+
+    /**
+     * Creates a new config option with the given key and default value.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @return the new config option
+     */
+    public static <K, V> ConfigOption<Map<K, V>> of(String key, Map<K, V> defaultValue,
+                                                    Class<K> keyType, Class<V> valueType) {
+        return new ConfigOption<>(key, defaultValue) {
+            @Override
+            public Map<K, V> cast(Object object) throws ClassCastException {
+                if (object instanceof Map<?, ?> map) {
+                    Map<K, V> castedMap = new LinkedHashMap<>(map.size());
+                    map.forEach((key, value) -> {
+                        K castedKey = cast(key, keyType);
+                        V castedValue = cast(value, valueType);
+                        castedMap.put(castedKey, castedValue);
+                    });
+                    return castedMap;
+                }
+                throw new ClassCastException("Cannot cast into map: " + object.getClass().getName());
+            }
+        };
     }
 
     // TODO: Move to format-specific logic?
     private static String formatDefaultValue(Object defaultValue) {
-        if (defaultValue instanceof List<?> list) {
+        if (defaultValue instanceof Collection<?> collection) {
             return "[" +
-                   list.stream()
+                   collection.stream()
                            .map(ConfigOption::formatDefaultValue)
                            .collect(Collectors.joining(", "))
                    + "]";
         }
         return String.valueOf(defaultValue);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static <T> T cast(Object object, Class<T> type) throws ClassCastException {
+        if (object == null) return null;
+        if (type.isInstance(object)) {
+            return type.cast(object);
+        }
+        if (object instanceof Number number) {
+            if (type == Integer.class) {
+                return (T) Integer.valueOf(number.intValue());
+            }
+            if (type == Long.class) {
+                return (T) Long.valueOf(number.longValue());
+            }
+            if (type == Double.class) {
+                return (T) Double.valueOf(number.doubleValue());
+            }
+            if (type == Float.class) {
+                return (T) Float.valueOf(number.floatValue());
+            }
+            if (type == Short.class) {
+                return (T) Short.valueOf(number.shortValue());
+            }
+            if (type == Byte.class) {
+                return (T) Byte.valueOf(number.byteValue());
+            }
+            throw new ClassCastException("Cannot cast into number type: " + type.getName());
+        }
+        if (type == Character.class) {
+            if (object instanceof String string && string.length() == 1) {
+                return (T) Character.valueOf(string.charAt(0));
+            }
+            throw new ClassCastException("Cannot cast into character: " + object.getClass().getName());
+        }
+        if (object instanceof Collection<?> collection) {
+            if (type == List.class) {
+                return (T) new ArrayList<>((Collection<?>) collection);
+            }
+            if (type == Set.class) {
+                return (T) new LinkedHashSet<>((Collection<?>) collection);
+            }
+        }
+        if (object instanceof Map<?, ?> map) {
+            return (T) new LinkedHashMap<>(map);
+        }
+        return type.cast(object);
+    }
+
+    /**
+     * Casts the given object to the type of this config option.
+     *
+     * @param object the object to cast
+     * @return the cast object
+     * @throws ClassCastException if the object cannot be cast to the type of this config option
+     */
+    @SuppressWarnings("unchecked")
+    public T cast(Object object) throws ClassCastException {
+        return cast(object, (Class<T>) getType());
+    }
+
+    /**
+     * Gets the type of the config option.
+     *
+     * @return the type of the config option
+     */
+    public Class<?> getType() {
+        return defaultValue.getClass();
     }
 
     /**

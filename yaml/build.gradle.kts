@@ -1,6 +1,5 @@
 plugins {
     id("java")
-    id("java-test-fixtures")
     id("maven-publish")
 }
 
@@ -12,17 +11,16 @@ repositories {
 }
 
 dependencies {
-    // Serialization
+    // Core
+    implementation(project(":core"))
+    // Yaml
     implementation("org.snakeyaml:snakeyaml-engine:2.9")
-
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.0")
-
     // Testing
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testFixturesImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(testFixtures(project(":core")))
 }
 
 java {
@@ -47,7 +45,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "configured"
+            artifactId = "configured-json"
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
         }

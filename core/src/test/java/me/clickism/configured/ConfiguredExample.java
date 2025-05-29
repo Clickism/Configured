@@ -1,9 +1,8 @@
-import me.clickism.configured.Config;
-import me.clickism.configured.ConfigOption;
+package me.clickism.configured;
 
 public class ConfiguredExample {
     public static final Config CONFIG =
-            Config.ofYaml("config.yml")
+            Config.of("config.yml")
                     .version(1)
                     .header("""
                             Example configuration file

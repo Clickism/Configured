@@ -1,4 +1,4 @@
 rootProject.name = "Configured"
 
-include(":core", ":localization")
+include(":core", ":localization", ":yaml", ":json")
 

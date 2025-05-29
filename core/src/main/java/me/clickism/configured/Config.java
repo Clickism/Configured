@@ -1,7 +1,8 @@
 package me.clickism.configured;
 
 import me.clickism.configured.format.ConfigFormat;
-import me.clickism.configured.format.YamlFormat;
+import me.clickism.configured.format.ConfigFormatRegistry;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -15,7 +16,7 @@ import java.util.logging.Level;
 public class Config {
     // TODO: Config formats in separate classes
     // TODO: Maybe add a way to add warning to not change the version
-    private static final ConfigOption<Integer> VERSION_OPTION = ConfigOption.of("_version", 0);
+    private static final ConfigOption<Integer> VERSION_OPTION = ConfigOption.ofObject("_version", 0);
 
     private final ConfigFormat format;
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
@@ -31,34 +32,51 @@ public class Config {
     /**
      * Creates a new Config instance.
      *
-     * @param format the format of the config file
      * @param file   the file to read/write the config from/to
+     * @param format the format of the config file
      */
-    public Config(ConfigFormat format, @Nullable File file) {
+    public Config(@Nullable File file, ConfigFormat format) {
         this.format = format;
         this.file = file;
     }
 
     /**
-     * Creates a new Config instance with the YAML format.
+     * Creates a new Config instance with the specified file.
+     * The format will be determined based on the file extension.
      *
      * @param file the file to read/write the config from/to
-     * @return the new Config instance
+     * @return a new Config instance
+     * @throws IllegalArgumentException if no format is found for the file extension
      */
-    public static Config ofYaml(File file) {
-        return new Config(new YamlFormat(), file);
+    public static Config of(@NotNull File file) {
+        ConfigFormat format = ConfigFormatRegistry.getFormat(file.getPath());
+        return new Config(file, format);
     }
 
-    // TODO: Error checking or specific function for when the option is not registered in the config
+    public static Config of(@NotNull String filePath) {
+        return of(new File(filePath));
+    }
 
     /**
-     * Creates a new Config instance with the YAML format.
+     * Creates a new Config instance with the specified file and format.
      *
-     * @param filePath the path to the file to read/write the config from/to
-     * @return the new Config instance
+     * @param file   the file to read/write the config from/to
+     * @param format the format of the config file
+     * @return a new Config instance
      */
-    public static Config ofYaml(String filePath) {
-        return ofYaml(new File(filePath));
+    public static Config of(@Nullable File file, ConfigFormat format) {
+        return new Config(file, format);
+    }
+
+    /**
+     * Creates a new Config instance with the specified file path and format.
+     *
+     * @param filePath the path to the config file
+     * @param format   the format of the config file
+     * @return a new Config instance
+     */
+    public static Config of(@NotNull String filePath, ConfigFormat format) {
+        return of(new File(filePath), format);
     }
 
     /**
@@ -72,8 +90,113 @@ public class Config {
      * @param <T>          the type of the option
      * @return the registered option
      */
-    public <T> ConfigOption<T> optionOf(String key, T defaultValue) {
+    public <T> ConfigOption<T> optionOfObject(String key, T defaultValue) {
+        return register(ConfigOption.ofObject(key, defaultValue));
+    }
+
+    /**
+     * Creates and registers a new option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @return the registered option
+     */
+    public ConfigOption<Boolean> optionOf(String key, boolean defaultValue) {
         return register(ConfigOption.of(key, defaultValue));
+    }
+
+    /**
+     * Creates and registers a new option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @return the registered option
+     */
+    public <T extends Number> ConfigOption<T> optionOf(String key, T defaultValue) {
+        return register(ConfigOption.of(key, defaultValue));
+    }
+
+    /**
+     * Creates and registers a new option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @return the registered option
+     */
+    public ConfigOption<String> optionOf(String key, String defaultValue) {
+        return register(ConfigOption.of(key, defaultValue));
+    }
+
+    /**
+     * Creates and registers a new option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @return the registered option
+     */
+    public ConfigOption<Character> optionOf(String key, char defaultValue) {
+        return register(ConfigOption.of(key, defaultValue));
+    }
+
+    /**
+     * Creates and registers a new list option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @param elementType  the type of the elements in the list
+     * @return the registered option
+     */
+    public <T> ConfigOption<List<T>> optionOf(String key, List<T> defaultValue,
+                                              Class<T> elementType) {
+        return register(ConfigOption.of(key, defaultValue, elementType));
+    }
+
+    /**
+     * Creates and registers a new set option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @param elementType  the type of the elements in the set
+     * @return the registered option
+     */
+    public <T> ConfigOption<Set<T>> optionOf(String key, Set<T> defaultValue,
+                                             Class<T> elementType) {
+        return register(ConfigOption.of(key, defaultValue, elementType));
+    }
+
+    /**
+     * Creates and registers a new map option in the config with the given key and default value.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.of(key, defaultValue))}.
+     * </p>
+     *
+     * @param key          the key of the option
+     * @param defaultValue the default value of the option
+     * @param keyType      the type of the keys in the map
+     * @param valueType    the type of the values in the map
+     * @return the registered option
+     */
+    public <K, V> ConfigOption<Map<K, V>> optionOf(String key, Map<K, V> defaultValue,
+                                                   Class<K> keyType, Class<V> valueType) {
+        return register(ConfigOption.of(key, defaultValue, keyType, valueType));
     }
 
     /**
@@ -121,7 +244,8 @@ public class Config {
         try {
             return (T) value;
         } catch (ClassCastException ignored) {
-            Configured.LOGGER.warning("Invalid value type for option '" + option.key() + "'. Using default value instead");
+            Configured.LOGGER.warning("Invalid value type for option '" + option.key()
+                                      + "'. Using default value instead");
             return option.defaultValue();
         }
     }
@@ -244,7 +368,9 @@ public class Config {
                 // Not necessary to load
                 return;
             }
-            data = format.read(file);
+            Map<String, Object> data = format.read(file);
+            castAllData(data);
+            this.data = data;
             if (isVersionMismatch() && update) {
                 Configured.LOGGER.info("Config file '" + file.getPath() + "' has a different version. Saving current version.");
                 save();
@@ -252,6 +378,24 @@ public class Config {
             callListeners();
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
+        }
+    }
+
+    /**
+     * Cast all data in the config to the correct type.
+     */
+    private void castAllData(Map<String, Object> data) {
+        for (ConfigOption<?> option : options) {
+            String key = option.key();
+            Object value = data.get(key);
+            if (value == null) continue;
+            try {
+                data.put(key, option.cast(value));
+            } catch (ClassCastException e) {
+                Configured.LOGGER.warning("Invalid value type for option '" + key
+                                          + "'. Using default value instead. Reason: " + e.getMessage());
+                data.put(key, option.defaultValue());
+            }
         }
     }
 
@@ -347,7 +491,7 @@ public class Config {
         // Save all data, even if they are not registered
         // Will keep order iff the data is a LinkedHashMap or similar.
         for (Map.Entry<String, Object> entry : data.entrySet()) {
-            ConfigOption<Object> option = ConfigOption.of(entry.getKey(), entry.getValue());
+            ConfigOption<Object> option = ConfigOption.ofObject(entry.getKey(), entry.getValue());
             if (options.contains(option)) continue; // Skip registered options
             dataToSave.add(Map.entry(option, entry.getValue()));
         }
