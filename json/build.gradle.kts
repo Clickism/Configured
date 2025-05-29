@@ -14,7 +14,7 @@ dependencies {
     // Core
     implementation(project(":core"))
     // Json
-    implementation("com.google.code.gson:gson:2.13.1")
+    implementation("com.google.code.gson:gson:2.10")
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.0")
     // Testing

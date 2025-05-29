@@ -2,7 +2,6 @@ package me.clickism.configured.format;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.Strictness;
 import com.google.gson.ToNumberPolicy;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * JSON format for configuration files.
@@ -110,13 +110,10 @@ public class JsonFormat extends BaseFormat {
     }
 
     private void setupForType(GsonBuilder builder) {
-        switch (this.type) {
-            case JSON -> {
-                writeComments(false);
-                separateConfigOptions(false); // Make compact by default
-                builder.setStrictness(Strictness.STRICT);
-            }
-            case JSONC -> builder.setStrictness(Strictness.LENIENT);
+        if (type == JsonType.JSON) {
+            writeComments(false);
+            separateConfigOptions(false); // Make compact by default
+            builder.setLenient();
         }
     }
 
