@@ -43,6 +43,16 @@ public class Config {
     /**
      * Creates a new Config instance with the specified file.
      * The format will be determined based on the file extension.
+     * <p>
+     * Available formats are:
+     * <ul>
+     *     <li><code>.yml</code> / <code>.yaml</code>: Standard YAML format</li>
+     *     <li><code>.json</code>: Standard JSON format</li>
+     *     <li><code>.jsonc</code>: JSON with comments</li>
+     * </ul>
+     * <p>
+     * <strong>WARNING:</strong> Make sure you have the correct format module (i.E: "configured-yaml")
+     * added to your project to use the desired format.
      *
      * @param file the file to read/write the config from/to
      * @return a new Config instance
@@ -56,6 +66,16 @@ public class Config {
     /**
      * Creates a new Config instance with the specified file path.
      * The format will be determined based on the file extension.
+     * <p>
+     * Available formats are:
+     * <ul>
+     *     <li><code>.yml</code> / <code>.yaml</code>: Standard YAML format</li>
+     *     <li><code>.json</code>: Standard JSON format</li>
+     *     <li><code>.jsonc</code>: JSON with comments</li>
+     * </ul>
+     * <p>
+     * <strong>WARNING:</strong> Make sure you have the correct format module (i.E: "configured-yaml")
+     * added to your project to use the desired format.
      *
      * @param filePath the path to the config file
      * @return a new Config instance

@@ -54,6 +54,16 @@ public class Localization {
      * Creates a new Localization instance with the given path generator function.
      * The format will be determined based on the file extension of the path
      * generated for an empty language code.
+     * <p>
+     * Available formats are:
+     * <ul>
+     *     <li><code>.yml</code> / <code>.yaml</code>: Standard YAML format</li>
+     *     <li><code>.json</code>: Standard JSON format</li>
+     *     <li><code>.jsonc</code>: JSON with comments</li>
+     * </ul>
+     * <p>
+     * <strong>WARNING:</strong> Make sure you have the correct format module (i.E: "configured-yaml")
+     * added to your project to use the desired format.
      *
      * @param pathGenerator a function that generates the path for the localization file based on the language code
      * @return a new Localization instance
