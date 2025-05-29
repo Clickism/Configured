@@ -2,7 +2,6 @@ package yaml;
 
 import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
-import me.clickism.configured.YamlConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -18,7 +17,7 @@ public class CommentTests {
     @Test
     public void testHeader(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = YamlConfig.of(path.toFile());
+        Config config = Config.ofYaml(path.toFile());
         config.header("""
                 HEADER
                 ------
@@ -38,7 +37,7 @@ public class CommentTests {
     @Test
     public void testFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = YamlConfig.of(path.toFile());
+        Config config = Config.ofYaml(path.toFile());
         config.footer("""
                 FOOTER
                 ------
@@ -58,7 +57,7 @@ public class CommentTests {
     @Test
     public void testHeaderAndFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = YamlConfig.of(path.toFile());
+        Config config = Config.ofYaml(path.toFile());
         config.header("""
                 HEADER
                 ------
@@ -92,7 +91,7 @@ public class CommentTests {
     @Test
     public void testOptionHeaderAndFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = YamlConfig.of(path.toFile());
+        Config config = Config.ofYaml(path.toFile());
         config.optionOf("name", "Hello")
                 .description("Name of the player");
         config.register(ConfigOption.of("test", 5)
@@ -122,7 +121,7 @@ public class CommentTests {
     @Test
     public void testAppendDefaultValue(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.yml");
-        Config config = YamlConfig.of(path.toFile());
+        Config config = Config.ofYaml(path.toFile());
         config.optionOf("test", 5)
                 .description("Test value")
                 .appendDefaultValue();

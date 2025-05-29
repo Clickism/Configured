@@ -25,15 +25,6 @@ public class YamlFormat extends BaseFormat {
             .setDefaultFlowStyle(FlowStyle.BLOCK)
             .build());
 
-    /**
-     * Creates a new YamlFormat instance.
-     *
-     * @return a new instance of YamlFormat
-     */
-    public static YamlFormat yaml() {
-        return new YamlFormat();
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public @NotNull Map<String, Object> read(File file) throws Exception {

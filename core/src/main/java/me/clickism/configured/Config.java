@@ -1,7 +1,7 @@
 package me.clickism.configured;
 
 import me.clickism.configured.format.ConfigFormat;
-import org.jetbrains.annotations.NotNull;
+import me.clickism.configured.format.YamlFormat;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -40,25 +40,25 @@ public class Config {
     }
 
     /**
-     * Creates a new Config instance with the specified format and file.
+     * Creates a new Config instance with the YAML format.
      *
-     * @param format the format of the config file
-     * @param file   the file to read/write the config from/to
-     * @return a new Config instance
+     * @param file the file to read/write the config from/to
+     * @return the new Config instance
      */
-    public static Config of(ConfigFormat format, @Nullable File file) {
-        return new Config(format, file);
+    public static Config ofYaml(File file) {
+        return new Config(new YamlFormat(), file);
     }
 
+    // TODO: Error checking or specific function for when the option is not registered in the config
+
     /**
-     * Creates a new Config instance with the specified format and file name.
+     * Creates a new Config instance with the YAML format.
      *
-     * @param format   the format of the config file
-     * @param fileName the name of the file to read/write the config from/to
-     * @return a new Config instance
+     * @param filePath the path to the file to read/write the config from/to
+     * @return the new Config instance
      */
-    public static Config of(ConfigFormat format, @NotNull String fileName) {
-        return of(format, new File(fileName));
+    public static Config ofYaml(String filePath) {
+        return ofYaml(new File(filePath));
     }
 
     /**

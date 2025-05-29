@@ -4,6 +4,7 @@ import me.clickism.configured.Config;
 import me.clickism.configured.ConfigOption;
 import me.clickism.configured.Configured;
 import me.clickism.configured.format.ConfigFormat;
+import me.clickism.configured.format.YamlFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,8 +56,8 @@ public class Localization {
      * @param pathGenerator a function that generates the path for the localization file based on the language code
      * @return a new Localization instance
      */
-    public static Localization of(ConfigFormat format, Function<String, String> pathGenerator) {
-        return new Localization(format, pathGenerator.andThen(File::new));
+    public static Localization ofYaml(Function<String, String> pathGenerator) {
+        return new Localization(new YamlFormat(), pathGenerator.andThen(File::new));
     }
 
     /**
