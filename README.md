@@ -3,10 +3,10 @@ Configured is a work-in-progress, format-independent configuration library for J
 versioned and documented configuration files directly from code in multiple formats such as YAML, JSON, and more.
 
 ### How to Use
-You can specify a config and register its options like this:
+You can specify a `.yml` config and register its options like this:
 ```java
 public static final Config CONFIG = 
-        Config.ofYaml("config.yml")
+        Config.of("config.yml")
                 .version(1)
                 .header("""
                         Example configuration file
@@ -35,7 +35,7 @@ public static void main(String[] args) {
 Which will generate a `config.yml` file like this:
 ```yaml
 # Example configuration file
-# Generated using Configured!
+# Using "Configured"!
 
 _version: 1
 
@@ -51,29 +51,31 @@ age: 18
 # Default: false
 student: false
 ```
-You can change the config format to JSON5 like this:
+You can change the config format to JSONC (JSON with comments)
+just by changing the file extension to `.jsonc`:
 ```java
-Config.ofJson5("config.json5")
+Config.of("config.jsonc")
+...
 ```
-Which will generate a `config.json5` file like this:
+Which will generate a `config.jsonc` file like this:
 ```json5
 {
-	// Example configuration file
-	// Using "Configured"!
+  // Example configuration file
+  // Using "Configured"!
 
-	"_version": 0,
+  "_version": 1,
 
-	// Name of the user
-	// Default: John Smith
-	"name": "John Smith",
+  // Name of the user
+  // Default: John Smith
+  "name": "John Smith",
 
-	// Age of the user
-	// Default: 18
-	"age": 18,
+  // Age of the user
+  // Default: 18
+  "age": 18,
 
-	// Whether the user is a student or not
-	// Default: false
-	"student": false
+  // Whether the user is a student or not
+  // Default: false
+  "student": false
 }
 ```
 You can then access/overwrite config values like this:
