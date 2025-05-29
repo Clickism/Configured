@@ -1,5 +1,4 @@
 import me.clickism.configured.Configured;
-import me.clickism.configured.format.JsonFormat;
 import me.clickism.configured.format.YamlFormat;
 import me.clickism.configured.localization.Localization;
 import me.clickism.configured.localization.LocalizationKey;
