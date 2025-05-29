@@ -254,7 +254,6 @@ public class Localization {
         if (!config.exists()) {
             if (resourceProvider != null) {
                 Configured.LOGGER.info("No localization file found for '" + language + "'. Deploying from resource...");
-                // todo: write current version to file if version is set
                 deployLocalizationFile(config, language);
                 return;
             } else {

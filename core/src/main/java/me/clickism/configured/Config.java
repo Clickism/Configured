@@ -14,8 +14,8 @@ import java.util.logging.Level;
  * Represents a configuration file.
  */
 public class Config {
-    // TODO: Config formats in separate classes
     // TODO: Maybe add a way to add warning to not change the version
+    // TODO: Transformation system to update the config file format
     private static final ConfigOption<Integer> VERSION_OPTION = ConfigOption.ofObject("_version", 0);
 
     private final ConfigFormat format;

@@ -22,8 +22,6 @@ public class ConfigOption<T> {
     private @Nullable String header;
     private @Nullable String footer;
 
-    // TODO: Auto-handle different collection types
-
     /**
      * Creates a new config option.
      *
