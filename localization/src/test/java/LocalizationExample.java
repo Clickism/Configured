@@ -1,7 +1,7 @@
-import me.clickism.configured.Configured;
-import me.clickism.configured.localization.Localization;
-import me.clickism.configured.localization.LocalizationKey;
-import me.clickism.configured.localization.Parameters;
+import de.clickism.configured.Configured;
+import de.clickism.configured.localization.Localization;
+import de.clickism.configured.localization.LocalizationKey;
+import de.clickism.configured.localization.Parameters;
 
 enum Message implements LocalizationKey {
     @Parameters("username")
