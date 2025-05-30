@@ -107,12 +107,15 @@ Which will generate a `config.jsonc` file like this:
   // Using "Configured"!
 
   "_version": 1,
+
   // Name of the user
   // Default: John Smith
   "name": "John Smith",
+
   // Age of the user
   // Default: 18
   "age": 18,
+
   // Whether the user is a student or not
   // Default: false
   "student": false
