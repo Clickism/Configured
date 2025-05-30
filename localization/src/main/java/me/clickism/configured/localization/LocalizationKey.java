@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a localization key used for retrieving localized messages.
+ * <p>
+ * By default, the key is derived from {@link Object#toString()} and is converted
+ * to lowercase with '$' replaced by '.'.
  */
 public interface LocalizationKey {
     /**
