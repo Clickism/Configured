@@ -19,7 +19,7 @@ and descriptions, which can be used to generate configuration files with comment
 - **🔧 Default Values**: Define default values for options that can be overridden.
 - **🔒 Type Safety**: Strongly typed configuration options for better safety and clarity.
   If the given value of a configuration option is invalid, it will use the default value instead.
-- **🌐 Localization API**: Simple and easy to use **enum-based** localization API to manage
+- **🌍 Localization API**: Simple and easy to use **enum-based** localization API to manage
   internationalization. Enjoy **autocompletion** in your IDE and no more hassle with mistyped
   keys or missing translations.
     - See [Getting Started: Localization 🌍](#getting-started-localization-) for more details.
