@@ -1,3 +1,9 @@
+/*
+ * Copyright 2025 Clickism
+ * Released under the GNU General Public License 3.0.
+ * See LICENSE.md for details.
+ */
+
 import de.clickism.configured.Configured;
 import de.clickism.configured.localization.Localization;
 import de.clickism.configured.localization.LocalizationKey;
