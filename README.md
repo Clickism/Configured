@@ -43,7 +43,7 @@ You can specify a `.yml` config and register its options like this:
 
 ```java
 public static final Config CONFIG =
-        Config.of("config.yml") // Data format inferred from the file extension
+        Config.of("config.yml") // Format inferred from the file extension
                 .version(1)
                 .header("""
                         Example configuration file
@@ -107,12 +107,15 @@ Which will generate a `config.jsonc` file like this:
   // Using "Configured"!
 
   "_version": 1,
+
   // Name of the user
   // Default: John Smith
   "name": "John Smith",
+
   // Age of the user
   // Default: 18
   "age": 18,
+
   // Whether the user is a student or not
   // Default: false
   "student": false
@@ -163,8 +166,8 @@ You can then create a `Localization` instance like this:
 
 ```java
 public static final Localization LOCALIZATION =
-        Localization.of(lang -> lang + ".json") // Data format inferred from the file extension
-                .resourceProvider(Configured.class, lang -> "/" + lang + ".json")
+        Localization.of(lang -> lang + ".json") // Format inferred from the file extension
+                .resourceProvider(Main.class, lang -> "/" + lang + ".json")
                 .fallbackLanguage("en_US")
                 .version(1)
                 .load();
