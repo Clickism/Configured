@@ -96,7 +96,7 @@ nmcp {
     centralPortal {
         username = findProperty("ossrhUsername") as String?
         password = findProperty("ossrhPassword") as String?
-        publishingType = "AUTOMATIC"
+        publishingType = "USER_MANAGED"
     }
 }
 
