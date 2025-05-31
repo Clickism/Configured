@@ -1,6 +1,13 @@
+/*
+ * Copyright 2025 Clickism
+ * Released under the GNU General Public License 3.0.
+ * See LICENSE.md for details.
+ */
+
 plugins {
     id("java")
     id("maven-publish")
+    id("signing")
 }
 
 group = "de.clickism"
@@ -42,14 +49,48 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "configured-localization"
             artifact(tasks["sourcesJar"])
             artifact(tasks["javadocJar"])
+            groupId = group.toString()
+            artifactId = "configured-localization"
+            version = version.toString()
+            pom {
+                name.set("Configured - Localization")
+                description.set("Easy to use, enum-based localization library built on Configured.")
+                url.set("https://github.com/Clickism/Configured")
+                licenses {
+                    license {
+                        name.set("GNU General Public License v3.0")
+                        url.set("https://www.gnu.org/licenses/gpl-3.0.html")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("Clickism")
+                        name.set("Clickism")
+                        email.set("dev@clickism.de")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/Clickism/Configured.git")
+                    developerConnection.set("scm:git:ssh://github.com/Clickism/Configured.git")
+                    url.set("https://github.com/Clickism/Configured")
+                }
+            }
         }
+    }
+    signing {
+        sign(publishing.publications["mavenJava"])
     }
     repositories {
         maven {
-            name = "mavenLocal"
+            name = "OSSRH"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+
+            credentials {
+                username = findProperty("ossrhUsername") as String?
+                password = findProperty("ossrhPassword") as String?
+            }
         }
     }
 }
