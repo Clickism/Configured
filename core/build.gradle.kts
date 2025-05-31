@@ -9,6 +9,7 @@ plugins {
     id("java-test-fixtures")
     id("maven-publish")
     id("signing")
+    id("com.gradleup.nmcp").version("0.1.4")
 }
 
 group = "de.clickism"
@@ -89,16 +90,13 @@ publishing {
     signing {
         sign(publishing.publications["mavenJava"])
     }
-    repositories {
-        maven {
-            name = "OSSRH"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+}
 
-            credentials {
-                username = findProperty("ossrhUsername") as String?
-                password = findProperty("ossrhPassword") as String?
-            }
-        }
+nmcp {
+    centralPortal {
+        username = findProperty("ossrhUsername") as String?
+        password = findProperty("ossrhPassword") as String?
+        publishingType = "AUTOMATIC"
     }
 }
 
