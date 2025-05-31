@@ -19,23 +19,36 @@ and descriptions, which can be used to generate configuration files with comment
 - **🔧 Default Values**: Define default values for options that can be overridden.
 - **🔒 Type Safety**: Strongly typed configuration options for better safety and clarity.
   If the given value of a configuration option is invalid, it will use the default value instead.
-- **🌍 Localization API**: Simple and easy to use **enum-based** localization API to manage
+- **🌍 Localization**: Simple and easy to use **enum-based** localization library to manage
   internationalization. Enjoy **autocompletion** in your IDE and no more hassle with mistyped
   keys or missing translations.
     - See [Getting Started: Localization 🌍](#getting-started-localization-) for more details.
 
 ## Adding to your Project 📦
-To add Configured to your project, you can use Maven or Gradle.
+Configured is available on **Maven Central**, so you can easily add it to your project
+using Maven or Gradle.
+
 Configured is divided into multiple modules:
-- `configured`: The core library that provides the main functionality.
-- `configured-localization`: The Localization API.
+- `configured-core`: The core configuration library.
+- `configured-localization`: The localization library built on top of Configured.
 
 And each data format has its own module:
 - `configured-yaml`: The YAML data format module.
 - `configured-json`: The JSON data format module.
 
-Make sure to include the modules you need in your project.
+Make sure to include the modules you need in your project:
+```kotlin
+repositories {
+    mavenCentral()
+}
 
+dependencies {
+    implementation("de.clickism:configured-core:0.2") // Required
+    implementation("de.clickism:configured-yaml:0.2")
+    implementation("de.clickism:configured-json:0.2")
+    implementation("de.clickism:configured-localization:0.2")
+}
+```
 
 ## Getting Started: Configuration 🛠️
 
