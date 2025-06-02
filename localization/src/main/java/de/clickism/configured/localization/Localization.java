@@ -76,7 +76,8 @@ public class Localization {
      * @throws IllegalArgumentException if no format is found for the file extension
      */
     public static Localization of(Function<String, String> pathGenerator) {
-        ConfigFormat format = ConfigFormatProvider.getFormat(pathGenerator.apply(""));
+        ConfigFormat format = ConfigFormatProvider.getFormat(pathGenerator.apply(""),
+                ConfigFormatProvider.getCallerClass());
         return of(pathGenerator, format);
     }
 
