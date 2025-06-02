@@ -19,9 +19,6 @@ repositories {
 }
 
 dependencies {
-    // Serialization
-    implementation("org.snakeyaml:snakeyaml-engine:2.9")
-
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.0")
 
