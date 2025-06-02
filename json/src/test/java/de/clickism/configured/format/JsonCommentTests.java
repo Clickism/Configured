@@ -23,7 +23,7 @@ public class JsonCommentTests {
     @Test
     public void testHeader(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.jsonc");
-        Config config = Config.of(path.toFile(), JsonFormat.jsonc());
+        Config config = Config.of(path.toFile());
         config.header("""
                 HEADER
                 ------
