@@ -7,7 +7,7 @@
 package de.clickism.configured;
 
 import de.clickism.configured.format.ConfigFormat;
-import de.clickism.configured.format.ConfigFormatRegistry;
+import de.clickism.configured.format.ConfigFormatProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,7 +65,7 @@ public class Config {
      * @throws IllegalArgumentException if no format is found for the file extension
      */
     public static Config of(@NotNull File file) {
-        ConfigFormat format = ConfigFormatRegistry.getFormat(file.getPath());
+        ConfigFormat format = ConfigFormatProvider.getFormat(file.getPath());
         return new Config(file, format);
     }
 

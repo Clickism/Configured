@@ -10,7 +10,7 @@ import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
 import de.clickism.configured.Configured;
 import de.clickism.configured.format.ConfigFormat;
-import de.clickism.configured.format.ConfigFormatRegistry;
+import de.clickism.configured.format.ConfigFormatProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +76,7 @@ public class Localization {
      * @throws IllegalArgumentException if no format is found for the file extension
      */
     public static Localization of(Function<String, String> pathGenerator) {
-        ConfigFormat format = ConfigFormatRegistry.getFormat(pathGenerator.apply(""));
+        ConfigFormat format = ConfigFormatProvider.getFormat(pathGenerator.apply(""));
         return of(pathGenerator, format);
     }
 
