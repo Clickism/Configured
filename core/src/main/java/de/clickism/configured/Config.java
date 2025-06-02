@@ -10,7 +10,6 @@ import de.clickism.configured.format.ConfigFormat;
 import de.clickism.configured.format.ConfigFormatProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import sun.reflect.ReflectionFactory;
 
 import java.io.File;
 import java.util.*;
