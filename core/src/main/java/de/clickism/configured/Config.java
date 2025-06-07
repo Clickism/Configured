@@ -715,6 +715,12 @@ public class Config {
         return this;
     }
 
+    /**
+     * Sets a function to generate old keys for all options.
+     *
+     * @param generator the function to generate old keys from the option key
+     * @return this Config instance
+     */
     public Config oldKeyGenerator(Function<String, String> generator) {
         this.oldKeyGenerator = generator;
         return this;
