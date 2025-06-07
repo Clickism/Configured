@@ -43,10 +43,10 @@ repositories {
 }
 
 dependencies {
-    implementation("de.clickism:configured-core:0.2.1") // Required
-    implementation("de.clickism:configured-yaml:0.2.1")
-    implementation("de.clickism:configured-json:0.2.1")
-    implementation("de.clickism:configured-localization:0.2.1")
+    implementation("de.clickism:configured-core:0.2.3") // Required
+    implementation("de.clickism:configured-yaml:0.2.3")
+    implementation("de.clickism:configured-json:0.2.3")
+    implementation("de.clickism:configured-localization:0.2.3")
 }
 ```
 
