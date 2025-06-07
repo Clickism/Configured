@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 /**
@@ -34,6 +35,8 @@ public class Config {
 
     private @Nullable String header;
     private @Nullable String footer;
+
+    private @Nullable Function<String, String> oldKeyGenerator;
 
     /**
      * Creates a new Config instance.
@@ -434,7 +437,13 @@ public class Config {
         for (ConfigOption<?> option : options) {
             String key = option.key();
             Object value = data.get(key);
-            if (value == null) continue;
+            if (value == null) {
+                value = getValueOfOldKey(option, data);
+                if (value == null) {
+                    // No value found, skip
+                    continue;
+                }
+            }
             try {
                 data.put(key, option.cast(value));
             } catch (ClassCastException e) {
@@ -443,6 +452,23 @@ public class Config {
                 data.put(key, option.defaultValue());
             }
         }
+    }
+
+    private @Nullable Object getValueOfOldKey(ConfigOption<?> option, Map<String, Object> data) {
+        Object value = null;
+        List<String> oldKeys = new ArrayList<>(option.oldKeys());
+        String generatedOldKey = generateOldKey(option);
+        if (generatedOldKey != null) {
+            oldKeys.add(generatedOldKey);
+        }
+        for (String oldKey : oldKeys) {
+            value = data.get(oldKey);
+            if (value == null) continue;
+            Configured.LOGGER.warning("Found old key '" + oldKey + "' for option '" + option.key()
+                                      + "'. Loading from it...");
+            break;
+        }
+        return value;
     }
 
     /**
@@ -687,5 +713,17 @@ public class Config {
     public Config footer(String footer) {
         this.footer = footer.trim();
         return this;
+    }
+
+    public Config oldKeyGenerator(Function<String, String> generator) {
+        this.oldKeyGenerator = generator;
+        return this;
+    }
+
+    private @Nullable String generateOldKey(ConfigOption<?> option) {
+        if (oldKeyGenerator != null) {
+            return oldKeyGenerator.apply(option.key());
+        }
+        return null;
     }
 }

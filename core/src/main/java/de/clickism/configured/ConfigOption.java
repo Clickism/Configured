@@ -23,6 +23,7 @@ public class ConfigOption<T> {
     private final String key;
     private final T defaultValue;
     private final List<Consumer<T>> onLoadListeners = new ArrayList<>();
+    private final Set<String> oldKeys = new HashSet<>();
     private boolean hidden = false;
     private @Nullable String description;
     private @Nullable String header;
@@ -459,6 +460,27 @@ public class ConfigOption<T> {
     public ConfigOption<T> footer(String footer) {
         this.footer = footer.trim();
         return this;
+    }
+
+    /**
+     * Adds an old key for the config option.
+     * Old keys are used to load values from previous versions of the config file.
+     *
+     * @param oldKey the old key to add
+     * @return this config option
+     */
+    public ConfigOption<T> oldKey(String oldKey) {
+        this.oldKeys.add(oldKey);
+        return this;
+    }
+
+    /**
+     * Gets the old keys of the config option.
+     *
+     * @return the set of old keys
+     */
+    public Set<String> oldKeys() {
+        return oldKeys;
     }
 
     @Override
