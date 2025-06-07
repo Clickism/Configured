@@ -22,7 +22,7 @@ dependencies {
     // Core
     implementation(project(":core"))
     // Yaml
-    implementation("org.snakeyaml:snakeyaml-engine:2.9")
+    implementation("org.yaml:snakeyaml:2.0")
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.0")
     // Testing

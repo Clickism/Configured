@@ -7,11 +7,8 @@
 package de.clickism.configured.format;
 
 import org.jetbrains.annotations.NotNull;
-import org.snakeyaml.engine.v2.api.Dump;
-import org.snakeyaml.engine.v2.api.DumpSettings;
-import org.snakeyaml.engine.v2.api.Load;
-import org.snakeyaml.engine.v2.api.LoadSettings;
-import org.snakeyaml.engine.v2.common.FlowStyle;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,16 +23,17 @@ import java.util.Map;
  */
 public class YamlFormat extends BaseFormat {
 
-    private final Load load = new Load(LoadSettings.builder().build());
-    private final Dump dump = new Dump(DumpSettings.builder()
-            .setMultiLineFlow(true)
-            .setDefaultFlowStyle(FlowStyle.BLOCK)
-            .build());
+    private final Yaml yaml;
 
     /**
      * Creates a new YamlFormat instance.
      */
-    protected YamlFormat() {}
+    protected YamlFormat() {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setPrettyFlow(true);
+        yaml = new Yaml(options);
+    }
 
     /**
      * Creates a new YamlFormat instance.
@@ -47,10 +45,9 @@ public class YamlFormat extends BaseFormat {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public @NotNull Map<String, Object> read(File file) throws Exception {
         try {
-            Map<String, Object> map = (Map<String, Object>) load.loadFromString(Files.readString(file.toPath()));
+            Map<String, Object> map = yaml.load(Files.readString(file.toPath()));
             return map != null ? map : new HashMap<>();
         } catch (Exception e) {
             throw new IOException("Failed to read config file: " + file.getPath(), e);
@@ -93,9 +90,9 @@ public class YamlFormat extends BaseFormat {
     private String dumpToString(Object value) {
         if (value instanceof Collection<?> collection) {
             // Avoid type casting issues with collections
-            return dump.dumpToString(new ArrayList<>(collection));
+            return yaml.dump(new ArrayList<>(collection));
         }
-        return dump.dumpToString(value);
+        return yaml.dump(value);
     }
 
     @Override
