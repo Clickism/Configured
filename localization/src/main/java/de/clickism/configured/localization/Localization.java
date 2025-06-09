@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 // TODO: Describe more about the localization system
 
@@ -356,7 +358,7 @@ public class Localization {
         if (config == null) {
             return getFallbackString(key);
         }
-        String localizedString = config.getOrNull(ConfigOption.ofObject(key.key(), null));
+        String localizedString = getStringOrNull(key, config);
         if (localizedString != null) {
             return localizedString;
         }
@@ -365,9 +367,23 @@ public class Localization {
 
     private String getFallbackString(LocalizationKey key) {
         if (fallbackConfig != null) {
-            return fallbackConfig.get(ConfigOption.ofObject(key.key(), key.key()));
+            String string = getStringOrNull(key, fallbackConfig);
+            if (string != null) {
+                return string;
+            }
         }
         return key.key();
+    }
+
+    private static @Nullable String getStringOrNull(LocalizationKey key, Config config) {
+        Object value = config.get(ConfigOption.ofObject(key.key(), null));
+        if (value == null) return null;
+        if (value instanceof Collection<?> multilineString) {
+            return multilineString.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining("\n"));
+        }
+        return value.toString();
     }
 
     /**
