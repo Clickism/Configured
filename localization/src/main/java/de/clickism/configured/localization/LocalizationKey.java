@@ -59,12 +59,12 @@ public interface LocalizationKey {
      * @return the key as a lowercase string with '$' replaced by '.'
      */
     default @NotNull String key() {
-        return getBaseKey().toLowerCase().replace('$', '.');
+        return getBaseKey().replace('$', '.');
     }
 
     private String getBaseKey() {
         if (this instanceof Enum<?> enumKey) {
-            return enumKey.name();
+            return enumKey.name().toLowerCase();
         }
         // Fallback to default toString() for non-enum keys
         return toString();
