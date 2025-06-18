@@ -39,7 +39,7 @@ public class ParameterRegistry {
         if (key == null) return;
         Class<?> clazz = key.getClass();
         if (!clazz.isEnum()) {
-            throw new IllegalArgumentException("LocalizationKey annotated with @Parameters must be an enum constant!");
+            return; // Only register parameters for enum classes
         }
         String className = clazz.getName();
         if (REGISTERED_CLASSES.contains(className)) return;
