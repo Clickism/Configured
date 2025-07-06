@@ -220,7 +220,9 @@ public class ConfigOption<T> {
             public T cast(Object object) throws ClassCastException {
                 if (object instanceof String string) {
                     try {
-                        return parser.apply(string);
+                        T parsed = parser.apply(string);
+                        if (parsed == null) throw new NullPointerException(); // Ignore null value
+                        return parsed;
                     } catch (Exception e) {
                         throw new ClassCastException("Failed to parse string: " + string
                                                      + " into type: " + defaultValue.getClass().getName());
