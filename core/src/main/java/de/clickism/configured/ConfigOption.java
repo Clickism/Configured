@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -198,6 +199,35 @@ public class ConfigOption<T> {
                     return castedMap;
                 }
                 throw new ClassCastException("Cannot cast into map: " + object.getClass().getName());
+            }
+        };
+    }
+
+    /**
+     * Creates a new config option with the given key, default value, and the parser function.
+     * <p>
+     * This config option will parse the string value into the specified type using the provided parser function.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @param parser       the function to parse the string value into the specified type
+     * @param <T>          the type of the config option
+     * @return the new config option
+     */
+    public static <T> ConfigOption<T> ofParsed(String key, T defaultValue, Function<String, T> parser) {
+        return new ConfigOption<>(key, defaultValue) {
+            @Override
+            public T cast(Object object) throws ClassCastException {
+                if (object instanceof String string) {
+                    try {
+                        return parser.apply(string);
+                    } catch (Exception e) {
+                        throw new ClassCastException("Failed to parse string: " + string
+                                                     + " into type: " + defaultValue.getClass().getName());
+                    }
+                }
+                throw new ClassCastException("Cannot cast into type: " + defaultValue.getClass().getName()
+                                             + " from: " + object.getClass().getName());
             }
         };
     }

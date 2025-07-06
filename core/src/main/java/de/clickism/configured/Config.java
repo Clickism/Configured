@@ -249,6 +249,23 @@ public class Config {
     }
 
     /**
+     * Creates and registers a new config option with the given key, default value, and the parser function.
+     * <p>
+     * This config option will parse the string value into the specified type using the provided parser function.
+     * <p>
+     * Equivalent to {@code register(ConfigOption.ofParsed(key, defaultValue, parser))}.
+     *
+     * @param key          the key of the config option
+     * @param defaultValue the default value of the config option
+     * @param parser       the function to parse the string value into the specified type
+     * @param <T>          the type of the config option
+     * @return the new config option
+     */
+    public <T> ConfigOption<T> optionOfParsed(String key, T defaultValue, Function<String, T> parser) {
+        return register(ConfigOption.ofParsed(key, defaultValue, parser));
+    }
+
+    /**
      * Registers a new option in the config.
      *
      * @param option the option to register
