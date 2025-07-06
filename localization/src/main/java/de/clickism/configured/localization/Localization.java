@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 // TODO: Describe more about the localization system
+// TODO: Add support for capitalization of parameters, i.E: {^user}
 
 /**
  * Localization class for managing localized messages.
