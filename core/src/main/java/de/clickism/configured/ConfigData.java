@@ -15,8 +15,9 @@ import java.util.logging.Level;
  * Class representing configuration data.
  */
 public class ConfigData {
-    private final Map<String, Object> data = new HashMap<>();
     private final Set<ConfigOption<?>> options;
+
+    private final Map<String, Object> data = new HashMap<>();
     private Map<String, Object> rawData = Map.of();
 
     private KeyGenerator keyGenerator = KeyGenerator.identity();

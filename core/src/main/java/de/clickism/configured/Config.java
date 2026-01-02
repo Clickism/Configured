@@ -7,6 +7,8 @@
 package de.clickism.configured;
 
 import de.clickism.configured.comments.HeaderFooter;
+import de.clickism.configured.event.ConfigEventBus;
+import de.clickism.configured.event.ConfigEventType;
 import de.clickism.configured.format.ConfigFormat;
 import de.clickism.configured.format.ConfigFormatProvider;
 import org.jetbrains.annotations.NotNull;
@@ -25,8 +27,12 @@ import java.util.logging.Level;
  */
 public class Config extends HeaderFooter<Config> {
     private final ConfigFormat format;
+
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
     private final ConfigData configData = new ConfigData(options);
+
+    private final ConfigEventBus eventBus = new ConfigEventBus();
+
     private final ConfigOption<Integer> versionOption =
             new ConfigOption<>("_version", 1, this);
     private @Nullable File file;
@@ -137,6 +143,7 @@ public class Config extends HeaderFooter<Config> {
      */
     public <T> Config set(ConfigOption<T> option, @Nullable T value) {
         configData.set(option, value);
+        eventBus.trigger(option, value, ConfigEventType.CHANGE);
         return this;
     }
 
@@ -147,6 +154,7 @@ public class Config extends HeaderFooter<Config> {
      */
     public void reset(ConfigOption<?> option) {
         configData.set(option, null);
+        eventBus.trigger(option, option.defaultValue(), ConfigEventType.RESET);
     }
 
     /**
@@ -197,7 +205,7 @@ public class Config extends HeaderFooter<Config> {
                     save();
                 }
                 // Still need to call listeners
-                callOnLoadListeners();
+                options.forEach(option -> eventBus.trigger(option, option.get(), ConfigEventType.LOAD, ConfigEventType.CHANGE));
                 // Not necessary to load
                 return;
             }
@@ -210,7 +218,7 @@ public class Config extends HeaderFooter<Config> {
                 save();
             }
             // Call listeners
-            callOnLoadListeners();
+            options.forEach(option -> eventBus.trigger(option, option.get(), ConfigEventType.LOAD, ConfigEventType.CHANGE));
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to load config file: " + file.getAbsolutePath(), e);
         }
@@ -252,15 +260,14 @@ public class Config extends HeaderFooter<Config> {
                 file.createNewFile();
             }
             format.write(this, dataToSave);
+            // Trigger save events
+            dataToSave.forEach(entry -> {
+                var option = (ConfigOption<?>) entry.getKey();
+                var value = entry.getValue();
+                eventBus.trigger(option, value, ConfigEventType.SAVE);
+            });
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to save config file: " + file.getAbsolutePath(), e);
-        }
-    }
-
-    private void callOnLoadListeners() {
-        for (ConfigOption<?> option : options) {
-            if (!configData.contains(option)) continue;
-            option.callOnLoadListeners();
         }
     }
 
@@ -368,5 +375,14 @@ public class Config extends HeaderFooter<Config> {
     public Config configureFormat(Consumer<ConfigFormat> configurator) {
         configurator.accept(format);
         return this;
+    }
+
+    /**
+     * Gets the event bus for this config.
+     *
+     * @return the event bus
+     */
+    public ConfigEventBus eventBus() {
+        return eventBus;
     }
 }

@@ -6,11 +6,15 @@
 
 package de.clickism.configured;
 
+import de.clickism.configured.event.ConfigEventHandler;
+import de.clickism.configured.event.ConfigEventType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a config option.
@@ -24,11 +28,9 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     private final Set<String> alternativeKeys = new HashSet<>();
 
     private final @Nullable T defaultValue;
-    // TODO: Add on change listeners?
-    private final List<Consumer<T>> onLoadListeners = new ArrayList<>();
-    private final List<Consumer<T>> onChangeListeners = new ArrayList<>();
-    private final @Nullable Config config;
     private Caster<T> caster;
+
+    private final @Nullable Config config;
 
     /**
      * Creates a new config option with an inferred caster.
@@ -133,23 +135,59 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     }
 
     /**
-     * Adds a listener that will be called when the config option is loaded.
+     * Adds an event handler for the specified event type.
      *
-     * @param listener the listener to add
+     * @param event   the event type
+     * @param handler the event handler
      * @return this config option
      */
-    public ConfigOption<T> onLoad(Consumer<T> listener) {
-        onLoadListeners.add(listener);
+    public ConfigOption<T> on(ConfigEventType event, ConfigEventHandler<T> handler) {
+        if (config == null) {
+            Configured.LOGGER.warning("ConfigOption '" + primaryKey + "' does not have a Config instance. Cannot add event handler.");
+            return this;
+        }
+        config.eventBus().registerHandler(this, handler, event);
         return this;
     }
 
     /**
-     * Calls all on-load listeners with the current value.
+     * Adds an event handler for when the config option is loaded.
+     *
+     * @param handler the event handler
+     * @return this config option
      */
-    public void callOnLoadListeners() {
-        for (var listener : onLoadListeners) {
-            listener.accept(get());
-        }
+    public ConfigOption<T> onLoad(ConfigEventHandler<T> handler) {
+        return on(ConfigEventType.LOAD, handler);
+    }
+
+    /**
+     * Adds an event handler for when the config option changes.
+     *
+     * @param handler the event handler
+     * @return this config option
+     */
+    public ConfigOption<T> onChange(ConfigEventHandler<T> handler) {
+        return on(ConfigEventType.CHANGE, handler);
+    }
+
+    /**
+     * Adds an event handler for when the config option is saved.
+     *
+     * @param handler the event handler
+     * @return this config option
+     */
+    public ConfigOption<T> onSave(ConfigEventHandler<T> handler) {
+        return on(ConfigEventType.SAVE, handler);
+    }
+
+    /**
+     * Adds an event handler for when the config option is reset.
+     *
+     * @param handler the event handler
+     * @return this config option
+     */
+    public ConfigOption<T> onReset(ConfigEventHandler<T> handler) {
+        return on(ConfigEventType.RESET, handler);
     }
 
     /**
@@ -184,6 +222,8 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     public Keys keys() {
         return new Keys(primaryKey, new ArrayList<>(alternativeKeys));
     }
+
+    // Overrides
 
     @Override
     public int hashCode() {
