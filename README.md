@@ -55,33 +55,35 @@ dependencies {
 You can specify a `.yml` config and register its options like this:
 
 ```java
-public static final Config CONFIG =
-        Config.of("config.yml") // Format inferred from the file extension
-                .version(1)
-                .header("""
-                        Example configuration file
-                        Generated using Configured!
-                        """);
+interface ConfiguredExample {
+  Config CONFIG =
+      Config.of("config.yml") // Format inferred from the file extension
+          .version(1)
+          .appendDefaults()
+          .header("""
+              Example configuration file
+              Using "Configured"!
+              """);
 
-public static final ConfigOption<String> NAME =
-        CONFIG.optionOf("name", "John Smith")
-                .description("Name of the user")
-                .appendDefaultValue();
+  ConfigOption<String> NAME =
+      CONFIG.option("name", "John Smith")
+          .description("Name of the user");
 
-public static final ConfigOption<Integer> AGE =
-        CONFIG.optionOf("age", 18)
-                .description("Age of the user")
-                .appendDefaultValue();
+  ConfigOption<Integer> AGE =
+      CONFIG.option("age", 18)
+          .description("Age of the user")
+          .onChange(value -> {
+            System.out.println("Age changed to: " + value);
+          });
 
-public static final ConfigOption<Boolean> STUDENT =
-        CONFIG.optionOf("student", true)
-                .description("Whether the user is a student or not")
-                .appendDefaultValue();
-
-public static void main(String[] args) {
-    CONFIG.load();
+  ConfigOption<Boolean> STUDENT =
+      CONFIG.option("student", false)
+          .description("Whether the user is a student or not");
 }
 ```
+
+> **Tip:** You can use an **interface** to hold your config instance and options, to
+> avoid writing `public static final` everywhere.
 
 Which will generate a `config.yml` file like this:
 
@@ -139,16 +141,18 @@ You can then access/overwrite config values like this:
 
 ```java
 public static void main(String[] args) {
-    CONFIG.load();
-    String name = CONFIG.get(NAME);
-    int age = CONFIG.get(AGE);
-    boolean student = CONFIG.get(STUDENT);
-    // Or overwrite them like:
-    CONFIG.set(NAME, "Jane Doe");
-    CONFIG.set(AGE, 20);
-    CONFIG.reset(STUDENT);
-    CONFIG.save(); // Don't forget to save afterward
+  CONFIG.load();
+  // Retrieve values:
+  String name = NAME.get();
+  int age = AGE.get();
+  boolean student = STUDENT.get();
+  // Or overwrite them:
+  NAME.set("Jane Doe");
+  AGE.set(20);
+  STUDENT.reset(); // Resets to default value
+  CONFIG.save(); // Don't forget to save afterward
 }
+
 ```
 
 ## Getting Started: Localization 🌍
