@@ -64,6 +64,12 @@ public interface KeyGenerator {
      */
     @FunctionalInterface
     interface SingleKeyMapper {
+        /**
+         * Maps the given primary key to an alternative key.
+         *
+         * @param primaryKey The primary key to map.
+         * @return The mapped alternative key.
+         */
         String map(String primaryKey);
     }
 
@@ -72,6 +78,12 @@ public interface KeyGenerator {
      */
     @FunctionalInterface
     interface MultiKeyMapper {
+        /**
+         * Maps the given primary key to multiple alternative keys.
+         *
+         * @param primaryKey The primary key to map.
+         * @return The list of mapped alternative keys.
+         */
         List<String> map(String primaryKey);
     }
 }

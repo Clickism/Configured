@@ -126,6 +126,7 @@ public abstract class ConfigOptionMeta<T> extends HeaderFooter<T> {
      * Hidden config options will be loaded, but their default values will not be
      * written to the config file by default.
      *
+     * @param hidden whether to mark this config option as hidden
      * @return this config option
      */
     public T hidden(boolean hidden) {

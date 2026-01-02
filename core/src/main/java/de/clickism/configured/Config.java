@@ -92,6 +92,7 @@ public class Config extends HeaderFooter<Config> {
      *
      * @param key          the key of the option
      * @param defaultValue the default value of the option
+     * @param <T>          the type of the option
      * @return the created ConfigOption
      */
     public <T> ConfigOption<T> option(String key, T defaultValue) {
@@ -163,6 +164,9 @@ public class Config extends HeaderFooter<Config> {
 
     /**
      * Registers a new option in the config.
+     *
+     * @param option the option to register
+     * @param <T>    the type of the option
      */
     public <T> void register(ConfigOption<T> option) {
         if (options.contains(option)) {
@@ -174,6 +178,9 @@ public class Config extends HeaderFooter<Config> {
 
     /**
      * Registers multiple options in the config.
+     *
+     * @param options the options to register
+     * @return this Config instance
      */
     public Config registerAll(Collection<ConfigOption<?>> options) {
         for (ConfigOption<?> option : options) {
