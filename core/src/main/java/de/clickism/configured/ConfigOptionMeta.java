@@ -25,6 +25,15 @@ public abstract class ConfigOptionMeta<T> extends HeaderFooter<T> {
     private boolean hidden;
 
     /**
+     * Creates a new standalone ConfigOptionMeta instance.
+     *
+     * @return the new standalone ConfigOptionMeta instance
+     */
+    public static Standalone standalone() {
+        return new Standalone() {};
+    }
+
+    /**
      * Formats the default value, handling collections.
      *
      * @param defaultValue the default value
@@ -32,16 +41,25 @@ public abstract class ConfigOptionMeta<T> extends HeaderFooter<T> {
      */
     private static String formatDefaultValue(Object defaultValue) {
         if (defaultValue instanceof Collection<?> collection) {
-            return "[" +
-                   collection.stream()
-                           .map(ConfigOptionMeta::formatDefaultValue)
-                           .collect(Collectors.joining(", "))
-                   + "]";
+            return "[" + collection.stream().map(ConfigOptionMeta::formatDefaultValue).collect(Collectors.joining(", ")) + "]";
         }
         return String.valueOf(defaultValue);
     }
 
-    // TODO: Move to format-specific logic?
+    /**
+     * Copies metadata from another ConfigOptionMeta instance.
+     *
+     * @param other the other ConfigOptionMeta instance
+     * @return this ConfigOptionMeta instance
+     */
+    public ConfigOptionMeta<?> copyFrom(ConfigOptionMeta<?> other) {
+        this.description = other.description;
+        this.defaultFormatter = other.defaultFormatter;
+        this.hidden = other.hidden;
+        this.header(other.header());
+        this.footer(other.footer());
+        return this;
+    }
 
     /**
      * Gets the description of the config option, formatted with the default value if applicable.
@@ -55,6 +73,8 @@ public abstract class ConfigOptionMeta<T> extends HeaderFooter<T> {
         }
         return defaultFormatter.format(description != null ? description : "", formatDefaultValue(value));
     }
+
+    // TODO: Move to format-specific logic?
 
     /**
      * Sets the description of the config option.
@@ -112,4 +132,9 @@ public abstract class ConfigOptionMeta<T> extends HeaderFooter<T> {
         this.hidden = hidden;
         return (T) this;
     }
+
+    /**
+     * Standalone subclass for ConfigOptionMeta.
+     */
+    public static class Standalone extends ConfigOptionMeta<Standalone> {}
 }

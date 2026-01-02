@@ -6,31 +6,35 @@
 
 package de.clickism.configured;
 
-public class ConfiguredExample {
-    public static final Config CONFIG =
+interface ConfiguredExample {
+    Config CONFIG =
             Config.of("config.yml")
                     .version(1)
+                    .appendDefaults()
                     .header("""
                             Example configuration file
                             Using "Configured"!
                             """);
 
-    public static final ConfigOption<String> NAME =
+    ConfigOption<String> NAME =
             CONFIG.option("name", "John Smith")
-                    .description("Name of the user")
-                    .appendDefault();
+                    .description("Name of the user");
 
-    public static final ConfigOption<Integer> AGE =
+    ConfigOption<Integer> AGE =
             CONFIG.option("age", 18)
                     .description("Age of the user")
-                    .appendDefault();
+                    .onChange(value -> {
+                        System.out.println("Age changed to: " + value);
+                    });
 
-    public static final ConfigOption<Boolean> STUDENT =
+    ConfigOption<Boolean> STUDENT =
             CONFIG.option("student", false)
-                    .description("Whether the user is a student or not")
-                    .appendDefault();
+                    .description("Whether the user is a student or not");
 
-    public static void main(String[] args) {
-        CONFIG.save();
+    static void main(String[] args) {
+        CONFIG.load();
+        String name = NAME.get();
+        int age = AGE.get();
+        boolean student = STUDENT.get();
     }
 }

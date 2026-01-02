@@ -6,6 +6,7 @@
 
 package de.clickism.configured;
 
+import de.clickism.configured.comments.DefaultFormatter;
 import de.clickism.configured.comments.HeaderFooter;
 import de.clickism.configured.event.ConfigEventBus;
 import de.clickism.configured.event.ConfigEventType;
@@ -37,6 +38,8 @@ public class Config extends HeaderFooter<Config> {
             new ConfigOption<>("_version", 1, this);
     private @Nullable File file;
     private @Nullable Integer version = null;
+
+    private final ConfigOptionMeta.Standalone baseOptionsMeta = ConfigOptionMeta.standalone();
 
     /**
      * Creates a new Config instance.
@@ -93,6 +96,7 @@ public class Config extends HeaderFooter<Config> {
      */
     public <T> ConfigOption<T> option(String key, T defaultValue) {
         ConfigOption<T> option = new ConfigOption<>(key, defaultValue, this);
+        option.copyFrom(baseOptionsMeta);
         register(option);
         return option;
     }
@@ -384,5 +388,41 @@ public class Config extends HeaderFooter<Config> {
      */
     public ConfigEventBus eventBus() {
         return eventBus;
+    }
+
+    /**
+     * Configures the base meta options for all config options created from this config.
+     *
+     * @param configurator the configurator to use
+     * @return this Config instance
+     */
+    public Config optionsMeta(Consumer<ConfigOptionMeta.Standalone> configurator) {
+        configurator.accept(baseOptionsMeta);
+        return this;
+    }
+
+    /**
+     * Appends default values to the config file when saving.
+     * <p>
+     * See {@link ConfigOptionMeta#appendDefault()} and {@link Config#optionsMeta(Consumer)} for details.
+     *
+     * @return this Config instance
+     */
+    public Config appendDefaults() {
+        baseOptionsMeta.appendDefault();
+        return this;
+    }
+
+    /**
+     * Appends default values to the config file when saving.
+     * <p>
+     * See {@link ConfigOptionMeta#appendDefault(DefaultFormatter)} and {@link Config#optionsMeta(Consumer)} for details.
+     *
+     * @param formatter the default formatter to use
+     * @return this Config instance
+     */
+    public Config appendDefaults(DefaultFormatter formatter) {
+        baseOptionsMeta.appendDefault(formatter);
+        return this;
     }
 }
