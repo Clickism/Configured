@@ -51,12 +51,14 @@ public class ConfigEventBus {
     /**
      * Triggers event handlers for a specific config option and event type.
      */
-    private void triggerSingle(ConfigOption<?> option, Object value, ConfigEventType type) {
+    @SuppressWarnings("unchecked")
+    private <T> void triggerSingle(ConfigOption<T> option, Object value, ConfigEventType type) {
         var eventHandlers = handlers
                 .getOrDefault(option, Map.of())
                 .getOrDefault(type, List.of());
         for (var handler : eventHandlers) {
-            handler.handle(value);
+            var typedHandler = (ConfigEventHandler<T>) handler;
+            typedHandler.handle((T) value);
         }
     }
 

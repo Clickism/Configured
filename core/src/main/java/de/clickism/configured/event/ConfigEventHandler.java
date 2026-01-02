@@ -18,5 +18,5 @@ public interface ConfigEventHandler<T> {
      *
      * @param value the configuration value associated with the event
      */
-    void handle(Object value);
+    void handle(T value);
 }
