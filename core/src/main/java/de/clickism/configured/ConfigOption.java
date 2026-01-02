@@ -114,7 +114,7 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
      */
     @SuppressWarnings("unchecked")
     public ConfigOption<T> listOf(Class<?> elementType) {
-        this.caster = (Caster<T>) Caster.listOf(Caster.of(elementType));
+        this.caster = (Caster<T>) Caster.listOf(elementType);
         return this;
     }
 
@@ -128,7 +128,7 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
      */
     @SuppressWarnings("unchecked")
     public ConfigOption<T> setOf(Class<?> elementType) {
-        this.caster = (Caster<T>) Caster.setOf(Caster.of(elementType));
+        this.caster = (Caster<T>) Caster.setOf(elementType);
         return this;
     }
 
@@ -143,7 +143,7 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
      */
     @SuppressWarnings("unchecked")
     public ConfigOption<T> mapOf(Class<?> keyType, Class<?> valueType) {
-        this.caster = (Caster<T>) Caster.mapOf(Caster.of(keyType), Caster.of(valueType));
+        this.caster = (Caster<T>) Caster.mapOf(keyType, valueType);
         return this;
     }
 

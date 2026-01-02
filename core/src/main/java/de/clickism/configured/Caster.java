@@ -129,6 +129,8 @@ public interface Caster<T> {
         };
     }
 
+    // Collection Casters
+
     /**
      * Creates a caster for a list of elements using the specified element caster.
      *
@@ -147,7 +149,16 @@ public interface Caster<T> {
         };
     }
 
-    // Collection Casters
+    /**
+     * Creates a caster for a list of elements using the specified element class.
+     *
+     * @param elementClass the class of the list elements
+     * @param <T>          the element type
+     * @return the list caster
+     */
+    static <T> Caster<List<T>> listOf(@NotNull Class<T> elementClass) {
+        return listOf(of(elementClass));
+    }
 
     /**
      * Creates a caster for a set of elements using the specified element caster.
@@ -165,6 +176,17 @@ public interface Caster<T> {
             }
             throw new ClassCastException("Cannot cast " + obj.getClass() + " to Set");
         };
+    }
+
+    /**
+     * Creates a caster for a set of elements using the specified element class.
+     *
+     * @param elementClass the class of the set elements
+     * @param <T>          the element type
+     * @return the set caster
+     */
+    static <T> Caster<Set<T>> setOf(@NotNull Class<T> elementClass) {
+        return setOf(of(elementClass));
     }
 
     /**
@@ -189,6 +211,19 @@ public interface Caster<T> {
             }
             throw new ClassCastException("Cannot cast " + obj.getClass() + " to Map");
         };
+    }
+
+    /**
+     * Creates a caster for a map using the specified key and value classes.
+     *
+     * @param keyClass   the class of the map keys
+     * @param valueClass the class of the map values
+     * @param <K>        the key type
+     * @param <V>        the value type
+     * @return the map caster
+     */
+    static <K, V> Caster<Map<K, V>> mapOf(@NotNull Class<K> keyClass, @NotNull Class<V> valueClass) {
+        return mapOf(of(keyClass), of(valueClass));
     }
 
     /**
