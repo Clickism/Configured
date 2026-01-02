@@ -97,6 +97,7 @@ public class ConfigData {
     public void loadFromMap(Map<String, Object> rawMap) {
         this.rawData = rawMap;
         data.clear();
+        data.putAll(rawMap); // Keep unregistered data
         for (var option : options) {
             Object value = resolveValue(option, rawMap);
             data.put(option.primaryKey(), value);
