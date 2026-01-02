@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Represents a config option.
@@ -25,14 +24,11 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     private final Set<String> alternativeKeys = new HashSet<>();
 
     private final @Nullable T defaultValue;
-
-    private Caster<T> caster;
-
     // TODO: Add on change listeners?
     private final List<Consumer<T>> onLoadListeners = new ArrayList<>();
     private final List<Consumer<T>> onChangeListeners = new ArrayList<>();
-
     private final @Nullable Config config;
+    private Caster<T> caster;
 
     /**
      * Creates a new config option with an inferred caster.
@@ -197,17 +193,5 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof ConfigOption<?> other && this.primaryKey.equals(other.primaryKey);
-    }
-
-    // TODO: Move to format-specific logic?
-    private static String formatDefaultValue(Object defaultValue) {
-        if (defaultValue instanceof Collection<?> collection) {
-            return "[" +
-                   collection.stream()
-                           .map(ConfigOption::formatDefaultValue)
-                           .collect(Collectors.joining(", "))
-                   + "]";
-        }
-        return String.valueOf(defaultValue);
     }
 }

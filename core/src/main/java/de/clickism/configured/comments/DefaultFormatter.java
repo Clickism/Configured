@@ -13,15 +13,6 @@ import org.jetbrains.annotations.NotNull;
  */
 @FunctionalInterface
 public interface DefaultFormatter {
-    /**
-     * Formats a description and value into a string.
-     *
-     * @param description description or empty string
-     * @param value       the default value
-     * @return the formatted string
-     */
-    String format(@NotNull String description, Object value);
-
     // Formatters
 
     /**
@@ -82,4 +73,13 @@ public interface DefaultFormatter {
             }
         };
     }
+
+    /**
+     * Formats a description and value into a string.
+     *
+     * @param description description or empty string
+     * @param value       the default value
+     * @return the formatted string
+     */
+    String format(@NotNull String description, Object value);
 }

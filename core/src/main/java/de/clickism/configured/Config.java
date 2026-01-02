@@ -27,12 +27,10 @@ public class Config extends HeaderFooter<Config> {
     private final ConfigFormat format;
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
     private final ConfigData configData = new ConfigData(options);
-
-    private @Nullable File file;
-
-    private @Nullable Integer version = null;
     private final ConfigOption<Integer> versionOption =
             new ConfigOption<>("_version", 1, this);
+    private @Nullable File file;
+    private @Nullable Integer version = null;
 
     /**
      * Creates a new Config instance.

@@ -10,6 +10,9 @@ import de.clickism.configured.comments.DefaultFormatter;
 import de.clickism.configured.comments.HeaderFooter;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 /**
  * Base class for config option metadata.
  *
@@ -22,6 +25,25 @@ public abstract class ConfigOptionMeta<T> extends HeaderFooter<T> {
     private boolean hidden;
 
     /**
+     * Formats the default value, handling collections.
+     *
+     * @param defaultValue the default value
+     * @return the formatted default value
+     */
+    private static String formatDefaultValue(Object defaultValue) {
+        if (defaultValue instanceof Collection<?> collection) {
+            return "[" +
+                   collection.stream()
+                           .map(ConfigOptionMeta::formatDefaultValue)
+                           .collect(Collectors.joining(", "))
+                   + "]";
+        }
+        return String.valueOf(defaultValue);
+    }
+
+    // TODO: Move to format-specific logic?
+
+    /**
      * Gets the description of the config option, formatted with the default value if applicable.
      *
      * @param value the default value to format into the description
@@ -31,7 +53,7 @@ public abstract class ConfigOptionMeta<T> extends HeaderFooter<T> {
         if (defaultFormatter == null) {
             return description;
         }
-        return defaultFormatter.format(description != null ? description : "", value);
+        return defaultFormatter.format(description != null ? description : "", formatDefaultValue(value));
     }
 
     /**

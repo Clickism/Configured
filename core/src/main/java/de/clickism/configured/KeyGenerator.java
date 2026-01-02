@@ -13,16 +13,6 @@ import java.util.List;
  */
 public interface KeyGenerator {
     /**
-     * Generates new keys based on the provided base keys.
-     *
-     * @param baseKeys The base keys to generate new keys from.
-     * @return The generated keys.
-     */
-    Keys generateKeys(Keys baseKeys);
-
-    // Key Generators
-
-    /**
      * KeyGenerator that returns the base keys without any modifications.
      *
      * @return The identity key generator.
@@ -30,6 +20,8 @@ public interface KeyGenerator {
     static KeyGenerator identity() {
         return baseKeys -> baseKeys;
     }
+
+    // Key Generators
 
     /**
      * KeyGenerator that adds a single alternative key mapped from the primary key.
@@ -56,6 +48,14 @@ public interface KeyGenerator {
             return primaryKey.layer(mappedKeys);
         };
     }
+
+    /**
+     * Generates new keys based on the provided base keys.
+     *
+     * @param baseKeys The base keys to generate new keys from.
+     * @return The generated keys.
+     */
+    Keys generateKeys(Keys baseKeys);
 
     // Key Mapper Interfaces
 

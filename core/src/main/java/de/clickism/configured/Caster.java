@@ -19,15 +19,6 @@ import java.util.stream.Collectors;
 @FunctionalInterface
 @SuppressWarnings("unchecked")
 public interface Caster<T> {
-    /**
-     * Casts an object to the target type.
-     *
-     * @param obj the object to cast
-     * @return the casted object
-     * @throws ClassCastException if the object cannot be casted
-     */
-    T cast(Object obj) throws ClassCastException;
-
     // Casters
 
     /**
@@ -138,8 +129,6 @@ public interface Caster<T> {
         };
     }
 
-    // Collection Casters
-
     /**
      * Creates a caster for a list of elements using the specified element caster.
      *
@@ -157,6 +146,8 @@ public interface Caster<T> {
             throw new ClassCastException("Cannot cast " + obj.getClass() + " to List");
         };
     }
+
+    // Collection Casters
 
     /**
      * Creates a caster for a set of elements using the specified element caster.
@@ -199,5 +190,14 @@ public interface Caster<T> {
             throw new ClassCastException("Cannot cast " + obj.getClass() + " to Map");
         };
     }
+
+    /**
+     * Casts an object to the target type.
+     *
+     * @param obj the object to cast
+     * @return the casted object
+     * @throws ClassCastException if the object cannot be casted
+     */
+    T cast(Object obj) throws ClassCastException;
 
 }
