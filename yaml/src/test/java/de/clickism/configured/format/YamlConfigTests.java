@@ -6,6 +6,7 @@
 
 package de.clickism.configured.format;
 
+import de.clickism.configured.Caster;
 import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
 import org.junit.jupiter.api.Test;
@@ -25,9 +26,10 @@ public class YamlConfigTests {
     @Test
     public void testDefaultSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
-        Config config = Config.of(file);
-        config.optionOf("enabled", true);
-        config.optionOf("list", List.of("a", "b", "c"), String.class);
+        Config config = Config.of(file.getPath());
+        config.option("enabled", true);
+        config.option("list", List.of("a", "b", "c"))
+                .withCaster(Caster.listOf(Caster.of(String.class)));
         config.save();
 
         assertTrue(file.exists(), "Config file should exist after saving");
@@ -45,9 +47,10 @@ public class YamlConfigTests {
     @Test
     public void testSave(@TempDir Path tempDir) throws IOException {
         File file = tempDir.resolve("config.yml").toFile();
-        Config config = Config.of(file);
-        ConfigOption<Boolean> enabled = config.optionOf("enabled", true);
-        ConfigOption<List<String>> list = config.optionOf("list", List.of("a", "b", "c"), String.class);
+        Config config = Config.of(file.getPath());
+        ConfigOption<Boolean> enabled = config.option("enabled", true);
+        ConfigOption<List<String>> list = config.option("list", List.of("a", "b", "c"))
+                .withCaster(Caster.listOf(Caster.of(String.class)));
         config.set(enabled, false);
         config.set(list, List.of("d", "e", "f"));
         config.save();
@@ -75,9 +78,11 @@ public class YamlConfigTests {
                 "  - c"
         ));
 
-        Config config = Config.of(file);
-        ConfigOption<Boolean> enabled = config.optionOf("enabled", false);
-        ConfigOption<List<String>> list = config.optionOf("list", List.of("x", "y", "z"), String.class);
+        Config config = Config.of(file.getPath());
+        ConfigOption<Boolean> enabled = config.option("enabled", false);
+        ConfigOption<List<String>> list = config.option("list", List.of("x", "y", "z"))
+                .withCaster(Caster.listOf(Caster.of(String.class)));
+
         config.load();
 
         assertTrue(config.get(enabled), "Enabled should be true");

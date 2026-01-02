@@ -6,8 +6,9 @@
 
 package de.clickism.configured.format;
 
+import de.clickism.configured.Caster;
 import de.clickism.configured.Config;
-import de.clickism.configured.ConfigOption;
+import de.clickism.configured.comments.DefaultFormatter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -23,7 +24,7 @@ public class JsonCommentTests {
     @Test
     public void testHeader(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.jsonc");
-        Config config = Config.of(path.toFile());
+        Config config = Config.of(path.toFile().getPath());
         config.header("""
                 HEADER
                 ------
@@ -45,7 +46,7 @@ public class JsonCommentTests {
     @Test
     public void testFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.jsonc");
-        Config config = Config.of(path.toFile(), JsonFormat.jsonc());
+        Config config = Config.of(path.toFile().getPath(), JsonFormat.jsonc());
         config.footer("""
                 FOOTER
                 ------
@@ -67,7 +68,7 @@ public class JsonCommentTests {
     @Test
     public void testHeaderAndFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.jsonc");
-        Config config = Config.of(path.toFile(), JsonFormat.jsonc());
+        Config config = Config.of(path.toFile().getPath(), JsonFormat.jsonc());
         config.header("""
                 HEADER
                 ------
@@ -78,7 +79,7 @@ public class JsonCommentTests {
                 ------
                 This is a footer comment
                 """);
-        config.optionOf("test", 5)
+        config.option("test", 5)
                 .description("Test value\nDefault: 5");
         config.save();
 
@@ -103,14 +104,14 @@ public class JsonCommentTests {
     @Test
     public void testOptionHeaderAndFooter(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.jsonc");
-        Config config = Config.of(path.toFile(), JsonFormat.jsonc());
-        config.optionOf("name", "Hello")
+        Config config = Config.of(path.toFile().getPath(), JsonFormat.jsonc());
+        config.option("name", "Hello")
                 .description("Name of the player");
-        config.register(ConfigOption.of("test", 5)
+        config.option("test", 5)
                 .header("Test header")
                 .description("Test value\nDefault: 5")
-                .footer("Test footer"));
-        config.optionOf("enabled", true);
+                .footer("Test footer");
+        config.option("enabled", true);
         config.save();
 
         String string = Files.readString(path);
@@ -135,23 +136,25 @@ public class JsonCommentTests {
     @Test
     public void testAppendDefaultValue(@TempDir Path tempDir) throws IOException {
         Path path = tempDir.resolve("config.jsonc");
-        Config config = Config.of(path.toFile(), JsonFormat.jsonc());
-        config.optionOf("test", 5)
+        Config config = Config.of(path.toFile().getPath(), JsonFormat.jsonc());
+        config.option("test", 5)
                 .description("Test value")
-                .appendDefaultValue();
-        config.optionOf("name", "Player")
-                .appendDefaultValue();
-        config.optionOf("enabled", true)
+                .appendDefault();
+        config.option("name", "Player")
+                .appendDefault();
+        config.option("enabled", true)
                 .description("""
                         Boolean value.
                         """)
-                .appendInlinedDefaultValue();
-        config.optionOf("pi", 3.14)
+                .appendDefault(DefaultFormatter.inline(false));
+        config.option("pi", 3.14)
                 .description("Pi constant")
-                .appendParenthesizedDefaultValue();
-        config.optionOf("list", List.of("a", "b", "c"), String.class)
-                .appendDefaultValue();
-        config.optionOf("map", Map.of("key", "value"), String.class, String.class)
+                .appendDefault(DefaultFormatter.inline(true));
+        config.option("list", List.of("a", "b", "c"))
+                .withCaster(Caster.listOf(Caster.of(String.class)))
+                .appendDefault();
+        config.option("map", Map.of("key", "value"))
+                .withCaster(Caster.mapOf(Caster.of(String.class), Caster.of(String.class)))
                 .description("Test Description");
         config.save();
 

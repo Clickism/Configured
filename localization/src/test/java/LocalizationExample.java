@@ -6,10 +6,10 @@
 
 import de.clickism.configured.Configured;
 import de.clickism.configured.localization.Localization;
-import de.clickism.configured.localization.LocalizationKey;
 import de.clickism.configured.localization.Parameters;
+import de.clickism.configured.localization.Translatable;
 
-enum Message implements LocalizationKey {
+enum Message implements Translatable {
     @Parameters("username")
     USER_NOT_FOUND,
     CONFIGURATION_ERROR,
@@ -17,10 +17,7 @@ enum Message implements LocalizationKey {
     @Parameters({"player", "action"})
     OPERATION_SUCCESS,
     @Parameters({"reason", "details"})
-    OPERATION_FAILED,
-}
-
-public class LocalizationExample {
+    OPERATION_FAILED;
 
     public static final Localization LOCALIZATION =
             Localization.of(lang -> lang + ".yml")
@@ -29,9 +26,17 @@ public class LocalizationExample {
                     .fallbackLanguage("en_US")
                     .language("en_US");
 
+    @Override
+    public Localization localization() {
+        return LOCALIZATION;
+    }
+}
+
+public class LocalizationExample {
+
     public static void main(String[] args) {
-        LOCALIZATION.load();
-        System.out.println(LOCALIZATION.get(Message.OPERATION_SUCCESS, "Clickism", "created a new config"));
-        System.out.println(LOCALIZATION.get(Message.OPERATION_FAILED, "Invalid data", "Data does not match expected format"));
+        Message.LOCALIZATION.load();
+        System.out.println(Message.OPERATION_SUCCESS.get("Clickism", "created a new config"));
+        System.out.println(Message.OPERATION_SUCCESS.get("Invalid data", "Data does not match expected format"));
     }
 }

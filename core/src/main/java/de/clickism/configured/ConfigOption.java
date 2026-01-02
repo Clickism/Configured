@@ -6,11 +6,11 @@
 
 package de.clickism.configured;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -20,288 +20,91 @@ import java.util.stream.Collectors;
  *
  * @param <T> the type of the config option
  */
-public class ConfigOption<T> {
-    private final String key;
-    private final T defaultValue;
+public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
+    private final String primaryKey;
+    private final Set<String> alternativeKeys = new HashSet<>();
+
+    private final @Nullable T defaultValue;
+
+    private Caster<T> caster;
+
+    // TODO: Add on change listeners?
     private final List<Consumer<T>> onLoadListeners = new ArrayList<>();
-    private final Set<String> oldKeys = new HashSet<>();
-    private boolean hidden = false;
-    private @Nullable String description;
-    private @Nullable String header;
-    private @Nullable String footer;
+    private final List<Consumer<T>> onChangeListeners = new ArrayList<>();
+
+    private final @Nullable Config config;
 
     /**
-     * Creates a new config option.
+     * Creates a new config option with an inferred caster.
      *
-     * @param key          the key of the config option
+     * @param primaryKey   the key of the config option
      * @param defaultValue the default value of the config option
+     * @param config       the config this option belongs to
      */
-    protected ConfigOption(String key, T defaultValue) {
-        this.key = key;
+    public ConfigOption(String primaryKey, @NotNull T defaultValue, @Nullable Config config) {
+        this(primaryKey, defaultValue, Caster.primitiveOf(defaultValue), config);
+    }
+
+    /**
+     * Creates a new config option with a custom caster.
+     *
+     * @param primaryKey   the key of the config option
+     * @param defaultValue the default value of the config option
+     * @param caster       the caster for this config option
+     * @param config       the config this option belongs to
+     */
+    public ConfigOption(String primaryKey, @Nullable T defaultValue, Caster<T> caster, @Nullable Config config) {
+        this.primaryKey = primaryKey;
         this.defaultValue = defaultValue;
+        this.caster = caster;
+        this.config = config;
     }
 
     /**
-     * Creates a new config option with the given key and default value.
-     * <p>
-     * <strong>WARNING</strong>: This method will only work if the config format supports
-     * objects of the given type. It is not guaranteed to work for all
-     * object types. Try to use the specific methods for primitive types
-     * and collections instead.
+     * Gets the value of the config option.
      *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param <T>          the type of the config option
-     * @return the new config option
+     * @return the value of the config option
      */
-    public static <T> ConfigOption<T> ofObject(String key, T defaultValue) {
-        return new ConfigOption<>(key, defaultValue);
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @return the new config option
-     */
-    public static ConfigOption<Boolean> of(String key, boolean defaultValue) {
-        return ofObject(key, defaultValue);
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param <T>          the type of the number
-     * @return the new config option
-     */
-    public static <T extends Number> ConfigOption<T> of(String key, T defaultValue) {
-        return ofObject(key, defaultValue);
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @return the new config option
-     */
-    public static ConfigOption<String> of(String key, String defaultValue) {
-        return ofObject(key, defaultValue);
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @return the new config option
-     */
-    public static ConfigOption<Character> of(String key, char defaultValue) {
-        return new ConfigOption<>(key, defaultValue) {
-            @Override
-            public Character cast(Object object) throws ClassCastException {
-                if (object instanceof Character character) {
-                    return character;
-                } else if (object instanceof String string) {
-                    if (string.length() != 1) {
-                        throw new ClassCastException("String must be a single character: " + string);
-                    }
-                    return string.charAt(0);
-                }
-                throw new ClassCastException("Cannot cast into character: " + object.getClass().getName());
-            }
-        };
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     * <p>
-     * <strong>WARNING:</strong> Only the elements of the list will be cast to the specified type.
-     * Objects won't recursively be cast to the specified element type.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param elementType  the type of the elements in the list
-     * @param <T>          the type of the elements in the list
-     * @return the new config option
-     */
-    public static <T> ConfigOption<List<T>> of(String key, List<T> defaultValue,
-                                               Class<T> elementType) {
-        return new ConfigOption<>(key, defaultValue) {
-            @Override
-            public List<T> cast(Object object) throws ClassCastException {
-                if (object instanceof Collection<?> collection) {
-                    return collection.stream()
-                            .map(element -> cast(element, elementType))
-                            .collect(Collectors.toCollection(ArrayList::new));
-                }
-                throw new ClassCastException("Cannot cast into list: " + object.getClass().getName());
-            }
-        };
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     * <p>
-     * <strong>WARNING:</strong> Only the elements of the set will be cast to the specified type.
-     * Objects won't recursively be cast to the specified element type.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param elementType  the type of the elements in the set
-     * @param <T>          the type of the elements in the set
-     * @return the new config option
-     */
-    public static <T> ConfigOption<Set<T>> of(String key, Set<T> defaultValue,
-                                              Class<T> elementType) {
-        return new ConfigOption<>(key, defaultValue) {
-            @Override
-            public Set<T> cast(Object object) throws ClassCastException {
-                if (object instanceof Collection<?> collection) {
-                    return collection.stream()
-                            .map(element -> cast(element, elementType))
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
-                }
-                throw new ClassCastException("Cannot cast into set: " + object.getClass().getName());
-            }
-        };
-    }
-
-    /**
-     * Creates a new config option with the given key and default value.
-     * <p>
-     * <strong>WARNING:</strong> Only the keys and values of the map will be cast to the specified types.
-     * Objects won't recursively be cast to the specified key and value types.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param keyType      the type of the keys in the map
-     * @param valueType    the type of the values in the map
-     * @param <K>          the type of the keys in the map
-     * @param <V>          the type of the values in the map
-     * @return the new config option
-     */
-    public static <K, V> ConfigOption<Map<K, V>> of(String key, Map<K, V> defaultValue,
-                                                    Class<K> keyType, Class<V> valueType) {
-        return new ConfigOption<>(key, defaultValue) {
-            @Override
-            public Map<K, V> cast(Object object) throws ClassCastException {
-                if (object instanceof Map<?, ?> map) {
-                    Map<K, V> castedMap = new LinkedHashMap<>(map.size());
-                    map.forEach((key, value) -> {
-                        K castedKey = cast(key, keyType);
-                        V castedValue = cast(value, valueType);
-                        castedMap.put(castedKey, castedValue);
-                    });
-                    return castedMap;
-                }
-                throw new ClassCastException("Cannot cast into map: " + object.getClass().getName());
-            }
-        };
-    }
-
-    /**
-     * Creates a new config option with the given key, default value, and the parser function.
-     * <p>
-     * This config option will parse the string value into the specified type using the provided parser function.
-     *
-     * @param key          the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param parser       the function to parse the string value into the specified type
-     * @param <T>          the type of the config option
-     * @return the new config option
-     */
-    public static <T> ConfigOption<T> ofParsed(String key, T defaultValue, Function<String, T> parser) {
-        return new ConfigOption<>(key, defaultValue) {
-            @Override
-            public T cast(Object object) throws ClassCastException {
-                if (object instanceof String string) {
-                    try {
-                        T parsed = parser.apply(string);
-                        if (parsed == null) throw new NullPointerException(); // Ignore null value
-                        return parsed;
-                    } catch (Exception e) {
-                        throw new ClassCastException("Failed to parse string: " + string
-                                                     + " into type: " + defaultValue.getClass().getName());
-                    }
-                }
-                throw new ClassCastException("Cannot cast into type: " + defaultValue.getClass().getName()
-                                             + " from: " + object.getClass().getName());
-            }
-        };
-    }
-
-    // TODO: Move to format-specific logic?
-    private static String formatDefaultValue(Object defaultValue) {
-        if (defaultValue instanceof Collection<?> collection) {
-            return "[" +
-                   collection.stream()
-                           .map(ConfigOption::formatDefaultValue)
-                           .collect(Collectors.joining(", "))
-                   + "]";
+    public T get() {
+        if (config == null) {
+            Configured.LOGGER.warning("ConfigOption '" + primaryKey + "' does not have a Config instance. Using default value.");
         }
-        return String.valueOf(defaultValue);
+        return config.get(this);
     }
 
     /**
-     * Casts the given object to the specified type.
-     * <p>
-     * This method handles primitive types, collections, maps, and numbers.
+     * Sets the value of the config option.
      *
-     * @param object the object to cast
-     * @param type   the type to cast to
-     * @param <T>    the type of the config option
-     * @return the cast object
-     * @throws ClassCastException if the object cannot be cast to the specified type
+     * @param value the value to set
      */
-    @SuppressWarnings("unchecked")
-    protected static <T> T cast(Object object, Class<T> type) throws ClassCastException {
-        if (object == null) return null;
-        if (type.isInstance(object)) {
-            return type.cast(object);
+    public void set(T value) {
+        if (config == null) {
+            Configured.LOGGER.warning("ConfigOption '" + primaryKey + "' does not have a Config instance. Cannot set value.");
+            return;
         }
-        if (object instanceof Number number) {
-            if (type == Integer.class) {
-                return (T) Integer.valueOf(number.intValue());
-            }
-            if (type == Long.class) {
-                return (T) Long.valueOf(number.longValue());
-            }
-            if (type == Double.class) {
-                return (T) Double.valueOf(number.doubleValue());
-            }
-            if (type == Float.class) {
-                return (T) Float.valueOf(number.floatValue());
-            }
-            if (type == Short.class) {
-                return (T) Short.valueOf(number.shortValue());
-            }
-            if (type == Byte.class) {
-                return (T) Byte.valueOf(number.byteValue());
-            }
-            throw new ClassCastException("Cannot cast into number type: " + type.getName());
+        config.set(this, value);
+    }
+
+    /**
+     * Resets the value of the config option to its default value.
+     */
+    public void reset() {
+        if (config == null) {
+            Configured.LOGGER.warning("ConfigOption '" + primaryKey + "' does not have a Config instance. Cannot reset value.");
+            return;
         }
-        if (type == Character.class) {
-            if (object instanceof String string && string.length() == 1) {
-                return (T) Character.valueOf(string.charAt(0));
-            }
-            throw new ClassCastException("Cannot cast into character: " + object.getClass().getName());
-        }
-        if (object instanceof Collection<?> collection) {
-            if (type == List.class) {
-                return (T) new ArrayList<>((Collection<?>) collection);
-            }
-            if (type == Set.class) {
-                return (T) new LinkedHashSet<>((Collection<?>) collection);
-            }
-        }
-        if (object instanceof Map<?, ?> map) {
-            return (T) new LinkedHashMap<>(map);
-        }
-        return type.cast(object);
+        config.reset(this);
+    }
+
+    /**
+     * Sets the caster for this config option.
+     *
+     * @param caster the caster to set
+     * @return this config option
+     */
+    public ConfigOption<T> withCaster(Caster<T> caster) {
+        this.caster = caster;
+        return this;
     }
 
     /**
@@ -311,18 +114,8 @@ public class ConfigOption<T> {
      * @return the cast object
      * @throws ClassCastException if the object cannot be cast to the type of this config option
      */
-    @SuppressWarnings("unchecked")
     public T cast(Object object) throws ClassCastException {
-        return cast(object, (Class<T>) getType());
-    }
-
-    /**
-     * Gets the type of the config option.
-     *
-     * @return the type of the config option
-     */
-    public Class<?> getType() {
-        return defaultValue.getClass();
+        return caster.cast(object);
     }
 
     /**
@@ -330,8 +123,8 @@ public class ConfigOption<T> {
      *
      * @return the key of the config option
      */
-    public String key() {
-        return key;
+    public String primaryKey() {
+        return primaryKey;
     }
 
     /**
@@ -341,29 +134,6 @@ public class ConfigOption<T> {
      */
     public T defaultValue() {
         return defaultValue;
-    }
-
-    /**
-     * Marks the config option as hidden.
-     * Hidden config options will be loaded, but their default values will not be
-     * written to the config file by default.
-     *
-     * @return this config option
-     */
-    public ConfigOption<T> hidden() {
-        this.hidden = true;
-        return this;
-    }
-
-    /**
-     * Checks if the config option is hidden.
-     * Hidden config options will be loaded, but their default values will not be
-     * written to the config file by default.
-     *
-     * @return true if the config option is hidden, false otherwise
-     */
-    public boolean isHidden() {
-        return hidden;
     }
 
     /**
@@ -378,150 +148,66 @@ public class ConfigOption<T> {
     }
 
     /**
-     * Gets the list of listeners that will be called when the config option is loaded.
-     *
-     * @return the list of listeners
+     * Calls all on-load listeners with the current value.
      */
-    public List<Consumer<T>> onLoadListeners() {
-        return onLoadListeners;
-    }
-
-    /**
-     * Gets the description of the config option.
-     *
-     * @return the description of the config option, or null if not set
-     */
-    public @Nullable String description() {
-        return description;
-    }
-
-    /**
-     * Sets the description of the config option.
-     *
-     * @param description the description of the config option
-     * @return this config option
-     */
-    public ConfigOption<T> description(String description) {
-        this.description = description.trim();
-        return this;
-    }
-
-    /**
-     * Appends the default value to the current description of the config option.
-     *
-     * @return this config option
-     */
-    public ConfigOption<T> appendDefaultValue() {
-        if (description != null) {
-            description += "\n";
+    public void callOnLoadListeners() {
+        for (var listener : onLoadListeners) {
+            listener.accept(get());
         }
-        appendDefaultValueInternal();
-        return this;
     }
 
     /**
-     * Appends the default value to the current description of the config option inlined,
-     * without a new line.
+     * Adds an alternative key for the config option.
+     * See {@link Keys} for more information.
      *
+     * @param key the alternative key to add
      * @return this config option
      */
-    public ConfigOption<T> appendInlinedDefaultValue() {
-        if (description != null) {
-            description += " ";
-        }
-        appendDefaultValueInternal();
+    public ConfigOption<T> alternativeKey(String key) {
+        this.alternativeKeys.add(key);
         return this;
     }
 
     /**
-     * Appends the default value to the current description of the config option in parentheses
-     * and inlined, without a new line.
+     * Adds alternative keys for the config option.
+     * See {@link Keys} for more information.
      *
+     * @param keys the alternative keys to add
      * @return this config option
      */
-    public ConfigOption<T> appendParenthesizedDefaultValue() {
-        if (description != null) {
-            description += " ";
-        }
-        description += "(";
-        appendDefaultValueInternal();
-        description += ")";
-        return this;
-    }
-
-    private void appendDefaultValueInternal() {
-        String string = description == null ? "" : description;
-        description = string + "Default: " + formatDefaultValue(defaultValue);
-    }
-
-    /**
-     * Gets the header of the config option.
-     *
-     * @return the header of the config option, or null if not set
-     */
-    public @Nullable String header() {
-        return header;
-    }
-
-    /**
-     * Sets the header of the config option.
-     *
-     * @param header the header of the config option
-     * @return this config option
-     */
-    public ConfigOption<T> header(String header) {
-        this.header = header.trim();
+    public ConfigOption<T> alternativeKeys(Collection<String> keys) {
+        this.alternativeKeys.addAll(keys);
         return this;
     }
 
     /**
-     * Gets the footer of the config option.
+     * Gets the keys of the config option.
      *
-     * @return the footer of the config option, or null if not set
+     * @return the keys of the config option
      */
-    public @Nullable String footer() {
-        return footer;
-    }
-
-    /**
-     * Sets the footer of the config option.
-     *
-     * @param footer the footer of the config option
-     * @return this config option
-     */
-    public ConfigOption<T> footer(String footer) {
-        this.footer = footer.trim();
-        return this;
-    }
-
-    /**
-     * Adds an old key for the config option.
-     * Old keys are used to load values from previous versions of the config file.
-     *
-     * @param oldKey the old key to add
-     * @return this config option
-     */
-    public ConfigOption<T> oldKey(String oldKey) {
-        this.oldKeys.add(oldKey);
-        return this;
-    }
-
-    /**
-     * Gets the old keys of the config option.
-     *
-     * @return the set of old keys
-     */
-    public Set<String> oldKeys() {
-        return oldKeys;
+    public Keys keys() {
+        return new Keys(primaryKey, new ArrayList<>(alternativeKeys));
     }
 
     @Override
     public int hashCode() {
-        return key.hashCode();
+        return primaryKey.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ConfigOption<?> other && this.key.equals(other.key);
+        return obj instanceof ConfigOption<?> other && this.primaryKey.equals(other.primaryKey);
+    }
+
+    // TODO: Move to format-specific logic?
+    private static String formatDefaultValue(Object defaultValue) {
+        if (defaultValue instanceof Collection<?> collection) {
+            return "[" +
+                   collection.stream()
+                           .map(ConfigOption::formatDefaultValue)
+                           .collect(Collectors.joining(", "))
+                   + "]";
+        }
+        return String.valueOf(defaultValue);
     }
 }

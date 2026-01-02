@@ -6,6 +6,7 @@
 
 package de.clickism.configured.format;
 
+import de.clickism.configured.Caster;
 import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
 import org.junit.jupiter.api.Test;
@@ -28,30 +29,33 @@ public class JsonSaveLoadTests {
     }
 
     public void testSaveAndLoad(File file) {
-        Config config = Config.of(file);
-        ConfigOption<String> stringValue = config.optionOf("stringValue", "Test String")
+        Config config = Config.of(file.getPath());
+        ConfigOption<String> stringValue = config.option("stringValue", "Test String")
                 .description("Test Description");
-        ConfigOption<Integer> integerValue = config.optionOf("integerValue", 5)
+        ConfigOption<Integer> integerValue = config.option("integerValue", 5)
                 .description("Test Description");
-        ConfigOption<Boolean> booleanValue = config.optionOf("booleanValue", true)
+        ConfigOption<Boolean> booleanValue = config.option("booleanValue", true)
                 .description("Test Description");
-        ConfigOption<Double> doubleValue = config.optionOf("doubleValue", 1.23)
+        ConfigOption<Double> doubleValue = config.option("doubleValue", 1.23)
                 .description("Test Description");
-        ConfigOption<Float> floatValue = config.optionOf("floatValue", 4.56f)
+        ConfigOption<Float> floatValue = config.option("floatValue", 4.56f)
                 .description("Test Description");
-        ConfigOption<Long> longValue = config.optionOf("longValue", 123456789L)
+        ConfigOption<Long> longValue = config.option("longValue", 123456789L)
                 .description("Test Description");
-        ConfigOption<Short> shortValue = config.optionOf("shortValue", (short) 42)
+        ConfigOption<Short> shortValue = config.option("shortValue", (short) 42)
                 .description("Test Description");
-        ConfigOption<Byte> byteValue = config.optionOf("byteValue", (byte) 7)
+        ConfigOption<Byte> byteValue = config.option("byteValue", (byte) 7)
                 .description("Test Description");
-        ConfigOption<Character> charValue = config.optionOf("charValue", 'A')
+        ConfigOption<Character> charValue = config.option("charValue", 'A')
                 .description("Test Description");
-        ConfigOption<Map<String, String>> map = config.optionOf("map", Map.of("key", "value"), String.class, String.class)
+        ConfigOption<Map<String, String>> map = config.option("map", Map.of("key", "value"))
+                .withCaster(Caster.mapOf(Caster.of(String.class), Caster.of(String.class)))
                 .description("Test Description");
-        ConfigOption<List<String>> list = config.optionOf("list", List.of("a", "b", "c"), String.class)
+        ConfigOption<List<String>> list = config.option("list", List.of("a", "b", "c"))
+                .withCaster(Caster.listOf(Caster.of(String.class)))
                 .description("Test Description");
-        ConfigOption<Set<Integer>> set = config.optionOf("set", Set.of(1, 2, 3), Integer.class)
+        ConfigOption<Set<Integer>> set = config.option("set", Set.of(1, 2, 3))
+                .withCaster(Caster.setOf(Caster.of(Integer.class)))
                 .description("Test Description");
         config.load();
         config.set(stringValue, "Jane Doe")

@@ -10,6 +10,7 @@ import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.List;
@@ -57,6 +58,10 @@ public abstract class BaseFormat extends ConfigFormat {
 
     @Override
     public void write(Config config, List<Map.Entry<ConfigOption<?>, Object>> data) throws Exception {
+        File file = config.file();
+        if (file == null) {
+            throw new IllegalStateException("Config file is null");
+        }
         StringBuilder sb = new StringBuilder();
         writeFormatHeader(sb);
         writeHeader(sb, config.header());
@@ -64,7 +69,7 @@ public abstract class BaseFormat extends ConfigFormat {
         writeFooter(sb, config.footer());
         writeFormatFooter(sb);
         String string = sb.toString();
-        Files.writeString(config.file().toPath(), string);
+        Files.writeString(file.toPath(), string);
     }
 
     /**
@@ -96,8 +101,8 @@ public abstract class BaseFormat extends ConfigFormat {
     protected void writeConfigOption(StringBuilder sb, ConfigOption<?> option,
                                      Object value, boolean hasNext) throws Exception {
         writeHeader(sb, option.header());
-        writeDescription(sb, option.description());
-        writeKeyValue(sb, option.key(), value, hasNext);
+        writeDescription(sb, option.descriptionWithDefault(option.defaultValue()));
+        writeKeyValue(sb, option.primaryKey(), value, hasNext);
         writeFooter(sb, option.footer());
         if (hasNext && separateConfigOptions) {
             sb.append('\n');

@@ -6,9 +6,7 @@
 
 package de.clickism.configured.localization;
 
-import de.clickism.configured.Config;
-import de.clickism.configured.ConfigOption;
-import de.clickism.configured.Configured;
+import de.clickism.configured.*;
 import de.clickism.configured.format.ConfigFormat;
 import de.clickism.configured.format.ConfigFormatProvider;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +22,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 // TODO: Describe more about the localization system
@@ -167,7 +166,7 @@ public class Localization {
     private boolean isVersionMismatch() {
         if (version == null) return false;
         if (config == null) return false; // No config loaded
-        return config.currentVersion()
+        return config.savedVersion()
                 .map(version -> !version.equals(this.version))
                 .orElse(true); // Mismatch if no version set in the config
     }
@@ -203,7 +202,7 @@ public class Localization {
      * @return this Localization instance
      */
     public Localization registerKey(LocalizationKey key) {
-        options.add(ConfigOption.ofObject(key.key(), key.key()));
+        options.add(new ConfigOption<>(key.key(), key.key(), null));
         return this;
     }
 
@@ -275,7 +274,7 @@ public class Localization {
         if (updateWithNewKeys) {
             config.load();
         } else {
-            config.loadWithoutUpdating();
+            config.load(LoadPolicy.IGNORE_VERSION_MISMATCH);
         }
         if (isVersionMismatch()) {
             if (resourceProvider != null) {
@@ -293,12 +292,12 @@ public class Localization {
         if (resourceProvider == null) return;
         String path = resourceProvider.pathGenerator.apply(language);
         if (deploySingleResource(resourceProvider.clazz(), path, fileGenerator.apply(language).getPath())) {
-            config.loadWithoutUpdating();
-            if (version != null && config.currentVersion().isEmpty()) {
+            config.load();
+            if (version != null && config.savedVersion().isEmpty()) {
                 // If the deployed file does not have a version, set it to the current version
                 config.version(version);
                 // Save the config with the new version and preserve unregistered data
-                config.saveWithUnregisteredData();
+                config.save(SavePolicy.INCLUDE_UNREGISTERED);
             }
         } else {
             config.load();
@@ -306,11 +305,14 @@ public class Localization {
     }
 
     private Config createLanguageConfig(String language) {
-        Config config = new Config(fileGenerator.apply(language), format);
+        Config config = Config.of(fileGenerator.apply(language).getPath(), format);
         if (version != null) {
             config.version(version);
         }
-        return config.separateConfigOptions(false)
+        return config
+                .configureFormat(format -> {
+                    format.separateConfigOptions(false);
+                })
                 .registerAll(options);
     }
 
@@ -355,6 +357,19 @@ public class Localization {
         return result;
     }
 
+    /**
+     * Retrieves a localized string for the given key with the specified parameters.
+     * <p>
+     * See {@link Localization#get(LocalizationKey, Object...)} for more information
+     *
+     * @param key    the localization key as a string
+     * @param params parameters to replace in the localized string
+     * @return the localized string with parameters replaced, or the localization key if no localization available
+     */
+    public String get(String key, Object... params) {
+        return get(LocalizationKey.of(key), params);
+    }
+
     private String getLocalizedString(LocalizationKey key) {
         if (config == null) {
             return getFallbackString(key);
@@ -377,7 +392,7 @@ public class Localization {
     }
 
     private static @Nullable String getStringOrNull(LocalizationKey key, Config config) {
-        Object value = config.get(ConfigOption.ofObject(key.key(), null));
+        Object value = config.getValue(key.key(), Object.class);
         if (value == null) return null;
         if (value instanceof Collection<?> multilineString) {
             return multilineString.stream()
@@ -466,7 +481,7 @@ public class Localization {
             Files.copy(in, destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
-            Configured.LOGGER.severe("Failed to deploy resource: " + e.getMessage());
+            Configured.LOGGER.log(Level.SEVERE, "Failed to deploy resource: " + e.getMessage(), e);
             return false;
         }
     }

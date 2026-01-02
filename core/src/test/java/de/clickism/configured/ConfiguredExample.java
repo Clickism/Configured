@@ -16,19 +16,19 @@ public class ConfiguredExample {
                             """);
 
     public static final ConfigOption<String> NAME =
-            CONFIG.optionOf("name", "John Smith")
+            CONFIG.option("name", "John Smith")
                     .description("Name of the user")
-                    .appendDefaultValue();
+                    .appendDefault();
 
     public static final ConfigOption<Integer> AGE =
-            CONFIG.optionOf("age", 18)
+            CONFIG.option("age", 18)
                     .description("Age of the user")
-                    .appendDefaultValue();
+                    .appendDefault();
 
     public static final ConfigOption<Boolean> STUDENT =
-            CONFIG.optionOf("student", false)
+            CONFIG.option("student", false)
                     .description("Whether the user is a student or not")
-                    .appendDefaultValue();
+                    .appendDefault();
 
     public static void main(String[] args) {
         CONFIG.save();
