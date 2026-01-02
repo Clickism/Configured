@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Clickism
+ * Copyright 2026 Clickism
  * Released under the GNU General Public License 3.0.
  * See LICENSE.md for details.
  */
@@ -28,9 +28,8 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     private final Set<String> alternativeKeys = new HashSet<>();
 
     private final @Nullable T defaultValue;
-    private Caster<T> caster;
-
     private final @Nullable Config config;
+    private Caster<T> caster;
 
     /**
      * Creates a new config option with an inferred caster.
@@ -102,6 +101,49 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
      */
     public ConfigOption<T> withCaster(Caster<T> caster) {
         this.caster = caster;
+        return this;
+    }
+
+    /**
+     * Sets the caster for this config option to a list of the given element type.
+     * <p>
+     * See {@link Caster#listOf(Caster)} for more information.
+     *
+     * @param elementType the element type of the list
+     * @return this config option
+     */
+    @SuppressWarnings("unchecked")
+    public ConfigOption<T> listOf(Class<?> elementType) {
+        this.caster = (Caster<T>) Caster.listOf(Caster.of(elementType));
+        return this;
+    }
+
+    /**
+     * Sets the caster for this config option to a set of the given element type.
+     * <p>
+     * See {@link Caster#setOf(Caster)} for more information.
+     *
+     * @param elementType the element type of the set
+     * @return this config option
+     */
+    @SuppressWarnings("unchecked")
+    public ConfigOption<T> setOf(Class<?> elementType) {
+        this.caster = (Caster<T>) Caster.setOf(Caster.of(elementType));
+        return this;
+    }
+
+    /**
+     * Sets the caster for this config option to a map of the given key and value types.
+     * <p>
+     * See {@link Caster#mapOf(Caster, Caster)} for more
+     *
+     * @param keyType   the key type of the map
+     * @param valueType the value type of the map
+     * @return this config option
+     */
+    @SuppressWarnings("unchecked")
+    public ConfigOption<T> mapOf(Class<?> keyType, Class<?> valueType) {
+        this.caster = (Caster<T>) Caster.mapOf(Caster.of(keyType), Caster.of(valueType));
         return this;
     }
 
