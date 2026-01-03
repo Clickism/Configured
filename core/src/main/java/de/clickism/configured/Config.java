@@ -27,6 +27,11 @@ import java.util.logging.Level;
  * Represents a configuration file.
  */
 public class Config extends HeaderFooter<Config> {
+    /**
+     * The key used to store the config version.
+     */
+    public static final String VERSION_KEY = "_version";
+
     private final ConfigFormat format;
 
     private final Set<ConfigOption<?>> options = new LinkedHashSet<>();
@@ -35,7 +40,7 @@ public class Config extends HeaderFooter<Config> {
     private final ConfigEventBus eventBus = new ConfigEventBus();
 
     private final ConfigOption<Integer> versionOption =
-            new ConfigOption<>("_version", 1, this);
+            new ConfigOption<>(VERSION_KEY, 1, this);
     private @Nullable File file;
     private @Nullable Integer version = null;
 
@@ -134,8 +139,8 @@ public class Config extends HeaderFooter<Config> {
      * @param <T>  the type of the option
      * @return the value of the option, or null if it is not set or has an invalid type
      */
-    public <T> T getValue(String key, Class<T> type) {
-        return configData.getOrNull(new ConfigOption<>(key, null, Caster.of(type), null));
+    public <T> @Nullable T getValue(String key, Class<T> type) {
+        return configData.getValue(key, type);
     }
 
     /**
@@ -280,6 +285,15 @@ public class Config extends HeaderFooter<Config> {
         } catch (Exception e) {
             Configured.LOGGER.log(Level.SEVERE, "Failed to save config file: " + file.getAbsolutePath(), e);
         }
+    }
+
+    /**
+     * Gets an unmodifiable set of all registered options in this config.
+     *
+     * @return an unmodifiable set of all registered options
+     */
+    public Set<ConfigOption<?>> registeredOptions() {
+        return Collections.unmodifiableSet(options);
     }
 
     /**

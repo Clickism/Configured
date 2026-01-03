@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 // TODO: Describe more about the localization system
 // TODO: Add support for capitalization of parameters, i.E: {^user}
 
+// TODO: Simplify updating version mismatches? Just deploy from resource
+
 /**
  * Localization class for managing localized messages.
  */
@@ -292,7 +294,7 @@ public class Localization {
         if (resourceProvider == null) return;
         String path = resourceProvider.pathGenerator.apply(language);
         if (deploySingleResource(resourceProvider.clazz(), path, fileGenerator.apply(language).getPath())) {
-            config.load();
+            config.load(LoadPolicy.IGNORE_VERSION_MISMATCH);
             if (version != null && config.savedVersion().isEmpty()) {
                 // If the deployed file does not have a version, set it to the current version
                 config.version(version);
@@ -300,7 +302,7 @@ public class Localization {
                 config.save(SavePolicy.INCLUDE_UNREGISTERED);
             }
         } else {
-            config.load();
+            config.load(LoadPolicy.IGNORE_VERSION_MISMATCH);
         }
     }
 

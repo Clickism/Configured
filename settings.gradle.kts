@@ -1,4 +1,4 @@
 rootProject.name = "Configured"
 
-include(":core", ":localization", ":yaml", ":json")
+include(":core", ":localization", ":yaml", ":json", ":paper-command-adapter")
 

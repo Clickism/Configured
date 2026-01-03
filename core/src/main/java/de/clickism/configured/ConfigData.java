@@ -62,6 +62,22 @@ public class ConfigData {
     }
 
     /**
+     * Gets the value associated with the specified key, or null if not set.
+     *
+     * @param key   the key of the config option
+     * @param clazz the class of the config option
+     * @param <T>   the type of the config option
+     * @return the value associated with the key, or null if not set
+     */
+    public <T> @Nullable T getValue(String key, Class<T> clazz) {
+        Object value = data.get(key);
+        if (value == null) {
+            return null;
+        }
+        return clazz.cast(value);
+    }
+
+    /**
      * Sets the value of the specified config option.
      *
      * @param option the config option

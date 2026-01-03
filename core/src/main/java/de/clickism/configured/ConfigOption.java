@@ -27,9 +27,10 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     private final String primaryKey;
     private final Set<String> alternativeKeys = new HashSet<>();
 
-    private final @Nullable T defaultValue;
-    private final @Nullable Config config;
+    private final T defaultValue;
     private Caster<T> caster;
+
+    private final @Nullable Config config;
 
     /**
      * Creates a new config option with an inferred caster.
@@ -39,21 +40,9 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
      * @param config       the config this option belongs to
      */
     public ConfigOption(String primaryKey, @NotNull T defaultValue, @Nullable Config config) {
-        this(primaryKey, defaultValue, Caster.primitiveOf(defaultValue), config);
-    }
-
-    /**
-     * Creates a new config option with a custom caster.
-     *
-     * @param primaryKey   the key of the config option
-     * @param defaultValue the default value of the config option
-     * @param caster       the caster for this config option
-     * @param config       the config this option belongs to
-     */
-    public ConfigOption(String primaryKey, @Nullable T defaultValue, Caster<T> caster, @Nullable Config config) {
         this.primaryKey = primaryKey;
         this.defaultValue = defaultValue;
-        this.caster = caster;
+        this.caster = Caster.primitiveOf(defaultValue);
         this.config = config;
     }
 
@@ -102,6 +91,15 @@ public class ConfigOption<T> extends ConfigOptionMeta<ConfigOption<T>> {
     public ConfigOption<T> withCaster(Caster<T> caster) {
         this.caster = caster;
         return this;
+    }
+
+    /**
+     * Gets the caster for this config option.
+     *
+     * @return the caster
+     */
+    public Caster<T> caster() {
+        return this.caster;
     }
 
     /**
