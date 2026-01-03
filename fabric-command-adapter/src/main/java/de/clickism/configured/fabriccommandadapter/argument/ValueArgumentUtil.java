@@ -36,8 +36,9 @@ public class ValueArgumentUtil {
      *
      * @param context the command context
      * @param builder the suggestions builder
+     * @return a future with the suggestions
      */
-    public @NotNull <S> CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
+    public @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<?> context, @NotNull SuggestionsBuilder builder) {
         Class<?> type = option.defaultValue().getClass();
         if (type == Boolean.class) {
             return BoolArgumentType.bool().listSuggestions(context, builder);
