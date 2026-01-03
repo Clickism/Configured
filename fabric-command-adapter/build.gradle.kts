@@ -8,7 +8,6 @@ plugins {
     id("java")
     id("maven-publish")
     id("signing")
-    id("com.gradleup.nmcp").version("0.1.4")
     id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
 }
 
@@ -96,16 +95,4 @@ publishing {
     signing {
         sign(publishing.publications["mavenJava"])
     }
-}
-
-nmcp {
-    centralPortal {
-        username = findProperty("ossrhUsername") as String?
-        password = findProperty("ossrhPassword") as String?
-        publishingType = "USER_MANAGED"
-    }
-}
-
-tasks.named("publish") {
-    dependsOn(tasks["sourcesJar"], tasks["javadocJar"])
 }

@@ -6,6 +6,24 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id("com.gradleup.nmcp.settings").version("1.4.3")
+}
+
+nmcpSettings {
+    centralPortal {
+        username = providers.gradleProperty("ossrhUsername").orNull
+        password = providers.gradleProperty("ossrhPassword").orNull
+        publishingType = "USER_MANAGED"
+    }
+}
 
 rootProject.name = "Configured"
 

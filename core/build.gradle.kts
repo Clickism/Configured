@@ -8,7 +8,6 @@ plugins {
     id("java")
     id("maven-publish")
     id("signing")
-    id("com.gradleup.nmcp").version("0.1.4")
 }
 
 group = "de.clickism"
@@ -31,28 +30,18 @@ dependencies {
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    withSourcesJar()
+    withJavadocJar()
 }
 
 tasks.test {
     useJUnitPlatform()
 }
 
-tasks.register<Jar>("sourcesJar") {
-    from(sourceSets.main.get().allSource)
-    archiveClassifier.set("sources")
-}
-
-tasks.register<Jar>("javadocJar") {
-    from(tasks.javadoc)
-    archiveClassifier.set("javadoc")
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
             groupId = group.toString()
             artifactId = "configured-core"
             version = version.toString()
@@ -84,16 +73,4 @@ publishing {
     signing {
         sign(publishing.publications["mavenJava"])
     }
-}
-
-nmcp {
-    centralPortal {
-        username = findProperty("ossrhUsername") as String?
-        password = findProperty("ossrhPassword") as String?
-        publishingType = "USER_MANAGED"
-    }
-}
-
-tasks.named("publish") {
-    dependsOn(tasks["sourcesJar"], tasks["javadocJar"])
 }
