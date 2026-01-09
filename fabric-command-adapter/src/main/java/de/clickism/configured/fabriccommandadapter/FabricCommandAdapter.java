@@ -1,14 +1,10 @@
-package de.clickism.configured.fabriccommandadapter;/*
- * Copyright 2026 Clickism
- * Released under the GNU General Public License 3.0.
- * See LICENSE.md for details.
- */
+package de.clickism.configured.fabriccommandadapter;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.clickism.configured.Config;
 import de.clickism.configured.fabriccommandadapter.command.AbstractSubCommand;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -22,7 +18,7 @@ import java.util.function.Predicate;
 public class FabricCommandAdapter {
     private final Config config;
     private List<AbstractSubCommand> subCommands = new ArrayList<>();
-    private @Nullable Predicate<ServerCommandSource> requirement;
+    private @Nullable Predicate<CommandSourceStack> requirement;
 
     /**
      * Creates a new PaperCommandAdapter.
@@ -49,7 +45,7 @@ public class FabricCommandAdapter {
      * @param requirement the requirement predicate
      * @return the current PaperCommandAdapter instance
      */
-    public FabricCommandAdapter requires(Predicate<ServerCommandSource> requirement) {
+    public FabricCommandAdapter requires(Predicate<CommandSourceStack> requirement) {
         this.requirement = requirement;
         return this;
     }
@@ -70,8 +66,8 @@ public class FabricCommandAdapter {
      *
      * @return the literal argument builder for the root command
      */
-    public LiteralArgumentBuilder<ServerCommandSource> buildRoot() {
-        var root = CommandManager.literal("config");
+    public LiteralArgumentBuilder<CommandSourceStack> buildRoot() {
+        var root = Commands.literal("config");
         if (requirement != null) {
             root.requires(requirement);
         }

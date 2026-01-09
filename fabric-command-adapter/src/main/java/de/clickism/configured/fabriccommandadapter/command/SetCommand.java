@@ -8,8 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
 import de.clickism.configured.fabriccommandadapter.argument.ValueArgumentUtil;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -19,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public record SetCommand(@Nullable OnSet onSet) implements AbstractSubCommand {
     @Override
-    public LiteralArgumentBuilder<ServerCommandSource> build(Config config) {
-        var set = CommandManager.literal("set");
+    public LiteralArgumentBuilder<CommandSourceStack> build(Config config) {
+        var set = Commands.literal("set");
 
         for (ConfigOption<?> option : config.registeredOptions()) {
             if (!ValueArgumentUtil.hasSupportedType(option)) continue;
@@ -32,19 +32,19 @@ public record SetCommand(@Nullable OnSet onSet) implements AbstractSubCommand {
         return set;
     }
 
-    private LiteralArgumentBuilder<ServerCommandSource> optionLiteral(
+    private LiteralArgumentBuilder<CommandSourceStack> optionLiteral(
             Config config,
             ConfigOption<?> option
     ) {
-        return CommandManager.literal(option.primaryKey())
-                .then(CommandManager.argument("value", StringArgumentType.string())
+        return Commands.literal(option.primaryKey())
+                .then(Commands.argument("value", StringArgumentType.string())
                         .suggests(new ValueArgumentUtil(option)::listSuggestions)
                         .executes(ctx -> execute(config, ctx, option)));
     }
 
     private <T> int execute(
             Config config,
-            CommandContext<ServerCommandSource> ctx,
+            CommandContext<CommandSourceStack> ctx,
             ConfigOption<T> option
     ) throws CommandSyntaxException {
         var sender = ctx.getSource();
@@ -71,7 +71,7 @@ public record SetCommand(@Nullable OnSet onSet) implements AbstractSubCommand {
          * @param value     the new value
          */
         void onSet(
-                ServerCommandSource sender,
+                CommandSourceStack sender,
                 String optionKey,
                 Object value
         );

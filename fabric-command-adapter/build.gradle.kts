@@ -26,7 +26,7 @@ dependencies {
     implementation(project(":core"))
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
     minecraft("com.mojang:minecraft:${minecraftVersion}")
-    mappings("net.fabricmc:yarn:${property("deps.yarn_mappings")}:v2")
+    mappings(loom.officialMojangMappings())
     // Annotations
     compileOnly("org.jetbrains:annotations:24.0.0")
     // Testing

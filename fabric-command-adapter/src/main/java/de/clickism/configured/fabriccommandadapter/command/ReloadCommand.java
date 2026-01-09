@@ -9,8 +9,8 @@ package de.clickism.configured.fabriccommandadapter.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.clickism.configured.Config;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,8 +20,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public record ReloadCommand(@Nullable OnReload onReload) implements AbstractSubCommand {
     @Override
-    public LiteralArgumentBuilder<ServerCommandSource> build(Config config) {
-        return CommandManager.literal("reload")
+    public LiteralArgumentBuilder<CommandSourceStack> build(Config config) {
+        return Commands.literal("reload")
                 .executes(ctx -> {
                     var sender = ctx.getSource();
                     config.load();
@@ -43,6 +43,6 @@ public record ReloadCommand(@Nullable OnReload onReload) implements AbstractSubC
          *
          * @param sender the command sender
          */
-        void onReload(ServerCommandSource sender);
+        void onReload(CommandSourceStack sender);
     }
 }

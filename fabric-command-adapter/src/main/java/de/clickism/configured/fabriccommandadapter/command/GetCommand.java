@@ -6,8 +6,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
 import de.clickism.configured.fabriccommandadapter.argument.ConfigOptionArgumentUtil;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -17,10 +17,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public record GetCommand(@Nullable OnGet onGet) implements AbstractSubCommand {
     @Override
-    public LiteralArgumentBuilder<ServerCommandSource> build(Config config) {
+    public LiteralArgumentBuilder<CommandSourceStack> build(Config config) {
         var optionArg = new ConfigOptionArgumentUtil(config);
-        return CommandManager.literal("get")
-                .then(CommandManager.argument("option", StringArgumentType.string())
+        return Commands.literal("get")
+                .then(Commands.argument("option", StringArgumentType.string())
                         .suggests(optionArg::listSuggestions)
                         .executes(ctx -> {
                             var sender = ctx.getSource();
@@ -48,7 +48,7 @@ public record GetCommand(@Nullable OnGet onGet) implements AbstractSubCommand {
          * @param value     the retrieved value
          */
         void onGet(
-                ServerCommandSource sender,
+                CommandSourceStack sender,
                 String optionKey,
                 Object value
         );

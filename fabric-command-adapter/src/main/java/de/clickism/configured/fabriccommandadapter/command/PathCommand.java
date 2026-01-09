@@ -9,8 +9,8 @@ package de.clickism.configured.fabriccommandadapter.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.clickism.configured.Config;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -20,8 +20,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public record PathCommand(@Nullable OnPath onPath) implements AbstractSubCommand {
     @Override
-    public LiteralArgumentBuilder<ServerCommandSource> build(Config config) {
-        return CommandManager.literal("path")
+    public LiteralArgumentBuilder<CommandSourceStack> build(Config config) {
+        return Commands.literal("path")
                 .executes(ctx -> {
                     var sender = ctx.getSource();
                     var file = config.file();
@@ -48,6 +48,6 @@ public record PathCommand(@Nullable OnPath onPath) implements AbstractSubCommand
          * @param sender the command sender
          * @param path   the path of the configuration file
          */
-        void onPath(ServerCommandSource sender, String path);
+        void onPath(CommandSourceStack sender, String path);
     }
 }
