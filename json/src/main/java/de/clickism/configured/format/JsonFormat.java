@@ -46,7 +46,7 @@ public class JsonFormat extends BaseFormat {
         GsonBuilder builder = new GsonBuilder();
         setupForType(builder);
         this.gson = builder.setPrettyPrinting()
-                .setObjectToNumberStrategy(ToNumberPolicy.LAZILY_PARSED_NUMBER)
+                .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
                 .create();
     }
 

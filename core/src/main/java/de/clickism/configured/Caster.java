@@ -41,7 +41,7 @@ public interface Caster<T> {
      * @return the caster
      */
     static <T> Caster<T> of(@NotNull Class<T> clazz) {
-        if (clazz.isPrimitive()) {
+        if (isPrimitiveClass(clazz)) {
             return primitiveOf(clazz);
         }
         return obj -> {
@@ -99,6 +99,25 @@ public interface Caster<T> {
         }
         // Fallback to unchecked cast
         return unchecked();
+    }
+
+    /**
+     * Checks if the specified class is a primitive or a wrapper type.
+     *
+     * @param clazz the class to check
+     * @return true if the class is a primitive or a wrapper type, false otherwise
+     */
+    static boolean isPrimitiveClass(@NotNull Class<?> clazz) {
+        return clazz.isPrimitive() ||
+               clazz == Boolean.class ||
+               clazz == Byte.class ||
+               clazz == Short.class ||
+               clazz == Integer.class ||
+               clazz == Long.class ||
+               clazz == Float.class ||
+               clazz == Double.class ||
+               clazz == Character.class ||
+               clazz == String.class;
     }
 
     /**
