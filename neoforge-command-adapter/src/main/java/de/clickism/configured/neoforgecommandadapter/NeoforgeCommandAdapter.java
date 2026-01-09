@@ -8,7 +8,7 @@ package de.clickism.configured.neoforgecommandadapter;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.clickism.configured.Config;
-import de.clickism.configured.fabriccommandadapter.command.AbstractSubCommand;
+import de.clickism.configured.neoforgecommandadapter.command.AbstractSubCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import org.jetbrains.annotations.Nullable;

@@ -11,7 +11,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
-import de.clickism.configured.fabriccommandadapter.argument.ConfigOptionArgumentUtil;
+import de.clickism.configured.neoforgecommandadapter.argument.ConfigOptionArgumentUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import org.jetbrains.annotations.Nullable;

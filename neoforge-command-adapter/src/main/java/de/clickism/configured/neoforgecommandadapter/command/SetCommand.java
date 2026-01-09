@@ -13,7 +13,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
-import de.clickism.configured.fabriccommandadapter.argument.ValueArgumentUtil;
+import de.clickism.configured.neoforgecommandadapter.argument.ValueArgumentUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import org.jetbrains.annotations.Nullable;
