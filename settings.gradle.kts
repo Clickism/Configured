@@ -27,5 +27,13 @@ nmcpSettings {
 
 rootProject.name = "Configured"
 
-include(":core", ":localization", ":yaml", ":json", ":paper-command-adapter", ":fabric-command-adapter")
+include(
+    ":core",
+    ":localization",
+    ":yaml",
+    ":json",
+    ":paper-command-adapter",
+    ":fabric-command-adapter",
+    ":neoforge-command-adapter"
+)
 
