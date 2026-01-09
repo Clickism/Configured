@@ -26,6 +26,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(project(":yaml"))
     testImplementation(project(":json"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.0")
 }
 
 java {
@@ -36,6 +37,7 @@ java {
 
 tasks.test {
     useJUnitPlatform()
+    failOnNoDiscoveredTests = false
 }
 
 publishing {
