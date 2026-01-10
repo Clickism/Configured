@@ -4,8 +4,10 @@
  * See LICENSE.md for details.
  */
 
-package de.clickism.configured.format;
+package de.clickism.configured.json;
 
+import de.clickism.configured.format.ConfigFormat;
+import de.clickism.configured.format.ConfigFormatProvider;
 import org.jetbrains.annotations.Nullable;
 
 /**

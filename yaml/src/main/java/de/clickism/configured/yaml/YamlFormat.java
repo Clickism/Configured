@@ -4,8 +4,9 @@
  * See LICENSE.md for details.
  */
 
-package de.clickism.configured.format;
+package de.clickism.configured.yaml;
 
+import de.clickism.configured.format.BaseFormat;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * YAML format for configuration files.
+ * YAML yaml for configuration files.
  */
 public class YamlFormat extends BaseFormat {
 

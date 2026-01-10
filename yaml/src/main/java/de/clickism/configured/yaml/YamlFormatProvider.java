@@ -4,12 +4,14 @@
  * See LICENSE.md for details.
  */
 
-package de.clickism.configured.format;
+package de.clickism.configured.yaml;
 
+import de.clickism.configured.format.ConfigFormat;
+import de.clickism.configured.format.ConfigFormatProvider;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Config format provider for YAML.
+ * Config yaml provider for YAML.
  */
 public class YamlFormatProvider extends ConfigFormatProvider {
     @Override

@@ -4,7 +4,7 @@
  * See LICENSE.md for details.
  */
 
-package de.clickism.configured.format;
+package de.clickism.configured.yaml;
 
 import de.clickism.configured.Config;
 import de.clickism.configured.ConfigOption;
