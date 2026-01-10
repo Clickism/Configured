@@ -1,21 +1,24 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
 license = "GPL-3.0"
-issueTrackerURL = "https://github.com/Clickism/Configured/issues"
-showAsResourcePack = false
 
 [[mods]]
-modId = "configured-neoforge-command-adapter"
+modId = "configured_neoforge_command_adapter"
 version = "${version}"
 displayName = "Configured Neoforge Command Adapter"
-logoFile = "assets/clickmobs/icon.png"
 authors = "Clickism"
-description = "Configured Neoforge Command Adapter Module."
+description = '''
+Configured Neoforge Command Adapter Module.
+'''
 
-[[dependencies.configured-neoforge-command-adapter]]
+[[dependencies.configured_neoforge_command_adapter]]
 modId = "neoforge"
 type = "required"
 versionRange = "*"
 side = "BOTH"
 
-[[dependencies.configured-neoforge-command-adapter]]
+[[dependencies.configured_neoforge_command_adapter]]
 modId = "minecraft"
 type = "required"
+versionRange = "[1.21.1,)"
+side = "BOTH"

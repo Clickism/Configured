@@ -23,6 +23,19 @@ repositories {
 
 neoForge {
     version = property("deps.neoforge").toString()
+    runs {
+        register("client") {
+            client()
+            gameDirectory = file("run/")
+            ideName = "NeoForge Client"
+            programArgument("--username=ClickToPlay")
+        }
+        register("server") {
+            server()
+            gameDirectory = file("run/")
+            ideName = "NeoForge Server"
+        }
+    }
     mods {
         register(property("mod.id").toString()) {
             sourceSet(sourceSets["main"])
@@ -51,7 +64,7 @@ tasks.processResources {
         "minecraftVersion" to minecraftVersion,
     )
 
-    filesMatching("fabric.mod.json") {
+    filesMatching(listOf("META-INF/neoforge.mods.toml", "META-INF/mods.toml")) {
         expand(properties)
     }
     inputs.properties(properties)

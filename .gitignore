@@ -8,3 +8,5 @@ build/
 *.json5
 *.json
 *.jsonc
+
+**/run/**
