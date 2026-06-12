@@ -126,9 +126,9 @@ public class ConfigData {
      * @param option the config option
      * @param map    the map containing raw configuration data
      * @param <T>    the type of the config option
-     * @return the resolved and casted value
+     * @return the resolved and casted value, or null if no saved value
      */
-    protected <T> T resolveValue(ConfigOption<T> option, Map<String, Object> map) {
+    protected <T> @Nullable T resolveValue(ConfigOption<T> option, Map<String, Object> map) {
         Keys keys = keyGenerator.generateKeys(option.keys());
         for (var key : keys) {
             if (!map.containsKey(key)) continue;
@@ -150,7 +150,7 @@ public class ConfigData {
                 // Ignore alternative key failures
             }
         }
-        return option.defaultValue();
+        return null;
     }
 
     /**

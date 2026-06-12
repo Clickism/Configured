@@ -13,13 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JsonSaveLoadTests {
     @Test
@@ -85,5 +86,18 @@ public class JsonSaveLoadTests {
         assertEquals(Map.of("key", "value", "key2", "value2"), config.get(map));
         assertIterableEquals(List.of("x", "y", "z"), config.get(list));
         assertIterableEquals(Set.of(4, 5, 6), config.get(set));
+    }
+
+    @Test
+    public void testConfigSavedVersion(@TempDir Path tempDir) throws IOException {
+        File file = tempDir.resolve("config.json").toFile();
+        Files.writeString(file.toPath(), """
+                {
+                    "hello": "world"
+                }
+                """);
+        Config config = Config.of(file.getPath()).version(2);
+        config.load();
+        assertNull(config.savedVersion().orElse(null));
     }
 }
