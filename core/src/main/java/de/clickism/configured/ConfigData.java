@@ -116,6 +116,7 @@ public class ConfigData {
         data.putAll(rawMap); // Keep unregistered data
         for (var option : options) {
             Object value = resolveValue(option, rawMap);
+            if (value == null) continue; // No saved value, keep default
             data.put(option.primaryKey(), value);
         }
     }
@@ -167,6 +168,9 @@ public class ConfigData {
             if (!policies.contains(SavePolicy.SAVE_HIDDEN) && option.hidden() && Objects.equals(value, option.defaultValue())) {
                 // Don't save hidden options if they are not set
                 continue;
+            }
+            if (value == null) {
+                throw new IllegalStateException("Option '" + option.primaryKey() + "' has null (default) value, which is not allowed!");
             }
             dataToSave.add(Map.entry(option, value));
         }
