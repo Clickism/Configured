@@ -72,8 +72,8 @@ public class JsonFormat extends BaseFormat {
     @Override
     @SuppressWarnings("unchecked")
     public @NotNull Map<String, Object> read(File file) throws IOException {
-        try {
-            Map<String, Object> map = gson.fromJson(new FileReader(file), Map.class);
+        try (FileReader reader = new FileReader(file)) {
+            Map<String, Object> map = gson.fromJson(reader, Map.class);
             if (map == null) throw new IOException("GSON returned null!");
             return map;
         } catch (Exception e) {
@@ -92,7 +92,7 @@ public class JsonFormat extends BaseFormat {
     protected void writeKeyValue(StringBuilder sb, String key,
                                  Object value, boolean hasNext) {
         String string = gson.toJson(value)
-                .replaceAll("\n", "\n  ");
+                .replace("\n", "\n  ");
         sb.append("  \"").append(key).append("\": ").append(string);
         if (hasNext) {
             sb.append(',');
