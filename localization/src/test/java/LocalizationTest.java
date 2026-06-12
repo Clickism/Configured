@@ -147,4 +147,27 @@ public class LocalizationTest {
                   "operation_failed": "Operation failed due to {reason}: {details}."
                 }""", Files.readString(file.toPath()));
     }
+
+    @Test
+    public void testExternalLanguageFile(@TempDir Path tempDir) throws IOException {
+        File file = tempDir.resolve("external.json").toFile();
+        localization =
+                Localization.of(lang -> file.getAbsolutePath())
+                        .version(1)
+                        .fallbackLanguage("external")
+                        .language("external")
+                        .resourceProvider(LocalizationTest.class, lang -> "en_US.json");
+
+        Files.writeString(file.toPath(), """
+                {
+                    "_version": 1,
+                    "user_not_found": "External: User {username} could not be found."
+                }
+                """);
+        localization.load();
+        assertEquals(
+                "External: User Alice could not be found.",
+                Message.USER_NOT_FOUND.get("Alice")
+        );
+    }
 }
