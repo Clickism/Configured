@@ -34,6 +34,7 @@ include(
     ":json",
     ":paper-command-adapter",
     ":fabric-command-adapter",
+    ":fabric+noremap-command-adapter",
     ":neoforge-command-adapter"
 )
 
